@@ -75,11 +75,7 @@ const RootRoute: React.FC = () => {
     return <Navigate to={getDashboardRouteForRole(role)} replace />;
   }
 
-  return (
-    <Layout>
-      <DesignSystemShowcase />
-    </Layout>
-  );
+  return <LoginPage />;
 };
 
 export const App: React.FC = () => {
