@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
-  Mail,
+  User,
   Lock,
   Eye,
   EyeOff,
   ArrowRight,
-  User,
-  ShieldCheck,
-  Building2,
   Info,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
@@ -17,17 +14,14 @@ import { Toast } from '../common/Toast';
 import { getFriendlyAuthErrorMessage } from '../../utils/authErrors';
 import { getDashboardRouteForRole } from '../../routes/routeConfig';
 
-export type LoginMode = 'citizen' | 'admin';
-
-const REMEMBER_ME_KEY = 'civicsight_remembered_identifier';
+const REMEMBER_ME_KEY = 'civicsight_remembered_username';
 
 export const LoginCard: React.FC = () => {
   const { login, isAuthenticated, role, isFirebaseConfigured } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [mode, setMode] = useState<LoginMode>('citizen');
-  const [identifier, setIdentifier] = useState<string>(() => {
+  const [username, setUsername] = useState<string>(() => {
     try {
       return localStorage.getItem(REMEMBER_ME_KEY) || '';
     } catch {
@@ -58,13 +52,9 @@ export const LoginCard: React.FC = () => {
     e.preventDefault();
     setErrorMessage(null);
 
-    const trimmedIdentifier = identifier.trim();
-    if (!trimmedIdentifier) {
-      setErrorMessage(
-        mode === 'citizen'
-          ? 'Please enter your email or mobile number.'
-          : 'Please enter your authority email or username.'
-      );
+    const trimmedUsername = username.trim();
+    if (!trimmedUsername) {
+      setErrorMessage('Please enter your username.');
       return;
     }
 
@@ -75,24 +65,14 @@ export const LoginCard: React.FC = () => {
 
     // Persist or clear remember me preference
     if (rememberMe) {
-      localStorage.setItem(REMEMBER_ME_KEY, trimmedIdentifier);
+      localStorage.setItem(REMEMBER_ME_KEY, trimmedUsername);
     } else {
       localStorage.removeItem(REMEMBER_ME_KEY);
     }
 
     setIsLoading(true);
     try {
-      const profile = await login(trimmedIdentifier, password);
-
-      // Validate admin mode attempt against role
-      if (mode === 'admin' && profile.role === 'citizen') {
-        // Logged in as citizen while selecting Admin tab
-        // We still route them to their citizen dashboard or show guidance
-        const destination = getDashboardRouteForRole(profile.role);
-        navigate(destination, { replace: true });
-        return;
-      }
-
+      const profile = await login(trimmedUsername, password);
       const destination = getDashboardRouteForRole(profile.role);
       navigate(destination, { replace: true });
     } catch (err: unknown) {
@@ -107,56 +87,13 @@ export const LoginCard: React.FC = () => {
     <div className="w-full max-w-[440px] mx-auto animate-in fade-in zoom-in-95 duration-500">
       <div className="bg-white/95 backdrop-blur-xl rounded-3xl p-7 sm:p-9 shadow-2xl shadow-slate-950/25 border border-white/80">
         {/* Brand Header */}
-        <div className="flex flex-col items-center text-center mb-6">
+        <div className="flex flex-col items-center text-center mb-7">
           <CivicSightLogo
             size="lg"
             subtitle="Smart City Management Platform"
             variant="dark"
             orientation="vertical"
           />
-        </div>
-
-        {/* Mode Selector Pills: [ Citizen ]  [ Admin ] */}
-        <div
-          role="tablist"
-          aria-label="Login Mode"
-          className="p-1 bg-slate-100/90 rounded-2xl flex items-center mb-6 border border-slate-200/60"
-        >
-          <button
-            type="button"
-            role="tab"
-            aria-selected={mode === 'citizen'}
-            onClick={() => {
-              setMode('citizen');
-              setErrorMessage(null);
-            }}
-            className={`flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer ${
-              mode === 'citizen'
-                ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
-            }`}
-          >
-            <User className="w-4 h-4" />
-            <span>Citizen</span>
-          </button>
-
-          <button
-            type="button"
-            role="tab"
-            aria-selected={mode === 'admin'}
-            onClick={() => {
-              setMode('admin');
-              setErrorMessage(null);
-            }}
-            className={`flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer ${
-              mode === 'admin'
-                ? 'bg-slate-900 text-white shadow-md shadow-slate-900/30'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
-            }`}
-          >
-            <ShieldCheck className="w-4 h-4" />
-            <span>Admin</span>
-          </button>
         </div>
 
         {/* Error Notification */}
@@ -171,49 +108,37 @@ export const LoginCard: React.FC = () => {
           </div>
         )}
 
-        {/* Authority / Admin Mode Guidance Banner */}
-        {mode === 'admin' && (
-          <div className="mb-5 p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 flex items-start gap-2.5">
-            <Building2 className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-            <div className="space-y-0.5">
-              <p className="font-bold text-slate-900">Project Manager &amp; Authority Access</p>
-              <p className="text-[11px] text-slate-600 leading-relaxed">
-                Authorized municipal officers and project managers authenticate using official municipal credentials.
-              </p>
-            </div>
-          </div>
-        )}
-
         {/* Dev Mode Notification if Firebase not configured */}
         {!isFirebaseConfigured && (
-          <div className="mb-4 p-2.5 rounded-xl bg-blue-50/80 border border-blue-200 text-[11px] text-blue-900 flex items-start gap-2">
+          <div className="mb-5 p-2.5 rounded-xl bg-blue-50/80 border border-blue-200 text-[11px] text-blue-900 flex items-start gap-2">
             <Info className="w-3.5 h-3.5 text-blue-600 shrink-0 mt-0.5" />
             <p>
-              <strong className="font-semibold">Local Session Store:</strong> Firebase keys not set in environment. Demo credentials work directly.
+              <strong className="font-semibold">Local Session Store:</strong> Firebase keys not configured. Local session credentials active.
             </p>
           </div>
         )}
 
         {/* Login Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Email or Mobile Number Input */}
-          <div className="space-y-1">
+          {/* Username Input */}
+          <div className="space-y-1.5">
+            <label
+              htmlFor="username"
+              className="block text-xs font-semibold text-slate-700"
+            >
+              Username
+            </label>
             <div className="relative rounded-xl border border-slate-200 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100 transition-all bg-white overflow-hidden shadow-xs">
               <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                {mode === 'citizen' ? (
-                  <Mail className="w-4 h-4" />
-                ) : (
-                  <ShieldCheck className="w-4 h-4 text-blue-600" />
-                )}
+                <User className="w-4 h-4" />
               </div>
               <input
-                type={mode === 'citizen' ? 'text' : 'text'}
+                id="username"
+                type="text"
                 required
-                value={identifier}
-                onChange={(e) => setIdentifier(e.target.value)}
-                placeholder={
-                  mode === 'citizen' ? 'Email or Mobile Number' : 'Authority Email or Username'
-                }
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Username"
                 autoComplete="username"
                 className="w-full pl-10 pr-4 py-3 text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-hidden bg-transparent"
               />
@@ -221,12 +146,19 @@ export const LoginCard: React.FC = () => {
           </div>
 
           {/* Password Input */}
-          <div className="space-y-1">
+          <div className="space-y-1.5">
+            <label
+              htmlFor="password"
+              className="block text-xs font-semibold text-slate-700"
+            >
+              Password
+            </label>
             <div className="relative rounded-xl border border-slate-200 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100 transition-all bg-white overflow-hidden shadow-xs">
               <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                 <Lock className="w-4 h-4" />
               </div>
               <input
+                id="password"
                 type={showPassword ? 'text' : 'password'}
                 required
                 value={password}
@@ -247,7 +179,7 @@ export const LoginCard: React.FC = () => {
           </div>
 
           {/* Remember me & Forgot Password */}
-          <div className="flex items-center justify-between text-xs pt-0.5">
+          <div className="flex items-center justify-between text-xs pt-1">
             <label className="flex items-center gap-2 cursor-pointer select-none text-slate-600">
               <input
                 type="checkbox"
@@ -271,11 +203,7 @@ export const LoginCard: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className={`w-full py-3.5 px-6 rounded-xl font-bold text-sm text-white shadow-lg transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer ${
-                mode === 'citizen'
-                  ? 'bg-gradient-to-r from-blue-600 via-sky-500 to-teal-500 hover:from-blue-700 hover:via-sky-600 hover:to-teal-600 shadow-blue-500/25'
-                  : 'bg-gradient-to-r from-slate-900 via-slate-800 to-blue-900 hover:from-slate-950 hover:to-blue-950 shadow-slate-900/25'
-              } disabled:opacity-70 disabled:cursor-not-allowed`}
+              className="w-full py-3.5 px-6 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-blue-600 via-sky-500 to-teal-500 hover:from-blue-700 hover:via-sky-600 hover:to-teal-600 shadow-lg shadow-blue-500/25 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <>

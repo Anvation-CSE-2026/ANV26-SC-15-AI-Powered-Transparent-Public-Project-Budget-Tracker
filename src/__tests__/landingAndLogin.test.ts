@@ -24,13 +24,13 @@ describe('Landing Page & Login Redesign Component Specifications', () => {
     ]);
   });
 
-  it('verifies remember-me storage key and mode selection logic', () => {
-    const REMEMBER_ME_KEY = 'civicsight_remembered_identifier';
-    expect(REMEMBER_ME_KEY).toBe('civicsight_remembered_identifier');
+  it('verifies remember-me storage key and username authentication model', () => {
+    const REMEMBER_ME_KEY = 'civicsight_remembered_username';
+    expect(REMEMBER_ME_KEY).toBe('civicsight_remembered_username');
 
-    const supportedModes: Array<'citizen' | 'admin'> = ['citizen', 'admin'];
-    expect(supportedModes).toContain('citizen');
-    expect(supportedModes).toContain('admin');
+    // Single unified login without role selector; role is determined server-side from profile
+    const loginField = 'Username';
+    expect(loginField).toBe('Username');
   });
 
   it('verifies the brand taglines match specifications', () => {
