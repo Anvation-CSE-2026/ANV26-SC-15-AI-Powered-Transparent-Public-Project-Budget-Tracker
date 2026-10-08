@@ -10,6 +10,7 @@ import {
   ExternalLink,
   MapPin,
   ShieldAlert,
+  Sparkles,
 } from 'lucide-react';
 
 export const QuickActionsBar: React.FC = () => {
@@ -71,6 +72,16 @@ export const QuickActionsBar: React.FC = () => {
           onClick={() => navigate('/dashboard/project-manager/risk-engine')}
         >
           Risk Engine
+        </Button>
+
+        <Button
+          variant="outline"
+          size="sm"
+          className="text-xs text-indigo-700 border-indigo-200 hover:bg-indigo-50"
+          leftIcon={<Sparkles className="w-3.5 h-3.5 text-indigo-600" />}
+          onClick={() => navigate('/dashboard/project-manager/ai')}
+        >
+          AI Intelligence
         </Button>
 
         <Button

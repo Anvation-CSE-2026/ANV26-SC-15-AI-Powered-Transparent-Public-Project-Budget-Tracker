@@ -57,6 +57,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const authorityItems: NavItem[] = [
     { id: 'authority-center', label: 'PM Command Center', path: '/dashboard/project-manager', icon: <BarChart3 className="w-4 h-4" /> },
+    { id: 'authority-ai', label: 'AI Intelligence Assistant', path: '/dashboard/project-manager/ai', icon: <Sparkles className="w-4 h-4" />, badge: 'Gemini' },
     { id: 'risk-engine', label: 'Risk Engine & Analytics', path: '/dashboard/project-manager/risk-engine', icon: <ShieldAlert className="w-4 h-4" />, badge: 'Anomaly' },
     { id: 'projects-management', label: 'Projects Management', path: '/dashboard/project-manager/projects', icon: <FolderGit2 className="w-4 h-4" />, badge: 'Active' },
     { id: 'complaints-queue', label: 'Complaints Queue', path: '/dashboard/project-manager/complaints', icon: <AlertCircle className="w-4 h-4" />, badge: 'SLA' },

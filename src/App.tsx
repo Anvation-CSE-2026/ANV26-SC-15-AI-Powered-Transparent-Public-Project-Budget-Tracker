@@ -64,6 +64,9 @@ import { ContractorSettingsPage } from './pages/contractor/ContractorSettingsPag
 import { AuthorityRiskEnginePage } from './pages/authority/AuthorityRiskEnginePage';
 import { CitizenAnalyticsPage } from './pages/citizen/CitizenAnalyticsPage';
 
+// Phase 11: Gemini AI Assistant Pages
+import { AuthorityAIPage } from './pages/authority/AuthorityAIPage';
+
 // Root Route Handler
 const RootRoute: React.FC = () => {
   const { isAuthenticated, role, loading } = useAuth();
@@ -552,6 +555,20 @@ export const App: React.FC = () => {
                 <RoleGuard allowedRoles={['project_manager']}>
                   <Layout>
                     <AuthorityRiskEnginePage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* PHASE 11: AUTHORITY AI INTELLIGENCE & TELEMETRY */}
+          <Route
+            path="/dashboard/project-manager/ai"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['project_manager']}>
+                  <Layout>
+                    <AuthorityAIPage />
                   </Layout>
                 </RoleGuard>
               </ProtectedRoute>
