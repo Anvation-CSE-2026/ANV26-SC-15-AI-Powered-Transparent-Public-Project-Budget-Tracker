@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Eye, Lock, Mail, User, ArrowRight, ShieldCheck, HardHat, Building2, UserCheck } from 'lucide-react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Eye, Lock, Mail, User, ArrowRight, ShieldCheck, HardHat, Building2 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { Button } from '../../components/common/Button';
 import { Input } from '../../components/common/Input';
@@ -12,12 +12,20 @@ import type { UserRole } from '../../types';
 export const RegisterPage: React.FC = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // Controlled admin registration mode
+  const [isAdminMode, setIsAdminMode] = useState<boolean>(
+    () => searchParams.get('mode') === 'admin'
+  );
 
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [role, setRole] = useState<UserRole>('citizen');
+  const [role, setRole] = useState<UserRole>(() =>
+    searchParams.get('mode') === 'admin' ? 'project_manager' : 'citizen'
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -58,8 +66,14 @@ export const RegisterPage: React.FC = () => {
     }
 
     // Role validation
-    if (!['citizen', 'project_manager', 'contractor'].includes(role)) {
-      errors.role = 'Please select a valid role.';
+    if (isAdminMode) {
+      if (!['project_manager', 'contractor'].includes(role)) {
+        errors.role = 'Please select a valid authorized role.';
+      }
+    } else {
+      if (role !== 'citizen') {
+        errors.role = 'Invalid role selected.';
+      }
     }
 
     setFieldErrors(errors);
@@ -72,6 +86,9 @@ export const RegisterPage: React.FC = () => {
 
     if (!validateForm()) return;
 
+    // Strict role assignment: normal registration is always 'citizen'
+    const targetRole: UserRole = isAdminMode ? role : 'citizen';
+
     setIsLoading(true);
     try {
       const profile = await register({
@@ -79,7 +96,7 @@ export const RegisterPage: React.FC = () => {
         email: email.trim(),
         password,
         confirmPassword,
-        role,
+        role: targetRole,
       });
 
       const destination = getDashboardRouteForRole(profile.role);
@@ -92,21 +109,16 @@ export const RegisterPage: React.FC = () => {
     }
   };
 
-  const roleOptions: Array<{
+  // Controlled role options available only in Admin / Authorized flow
+  const adminRoleOptions: Array<{
     id: UserRole;
     title: string;
     description: string;
     icon: React.ReactNode;
   }> = [
     {
-      id: 'citizen',
-      title: 'Citizen',
-      description: 'Track public projects, report civic issues, budget transparency & vote.',
-      icon: <UserCheck className="w-5 h-5" />,
-    },
-    {
       id: 'project_manager',
-      title: 'Project Manager',
+      title: 'Project Manager / High Authority',
       description: 'Central command authority, oversee projects, assign SLA & approve updates.',
       icon: <Building2 className="w-5 h-5" />,
     },
@@ -137,10 +149,12 @@ export const RegisterPage: React.FC = () => {
           “See the Project. Understand the Data. Make Your Voice Count.”
         </p>
         <h2 className="mt-3 text-center text-lg font-bold text-white tracking-tight font-heading">
-          Create Your CivicSight Account
+          {isAdminMode ? 'Authorized Personnel Registration' : 'Create Your CivicSight Account'}
         </h2>
         <p className="mt-1 text-center text-xs text-slate-400">
-          Select your municipal role to configure your access privileges
+          {isAdminMode
+            ? 'Municipal Project Manager & Contractor Charter Access'
+            : 'Join your transparent smart city civic governance network'}
         </p>
       </div>
 
@@ -158,48 +172,62 @@ export const RegisterPage: React.FC = () => {
           )}
 
           <form className="space-y-4" onSubmit={handleSubmit}>
-            {/* Role Selection Grid */}
-            <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                Select Your Role <span className="text-rose-500">*</span>
-              </label>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {roleOptions.map((opt) => {
-                  const isSelected = role === opt.id;
-                  return (
-                    <div
-                      key={opt.id}
-                      onClick={() => setRole(opt.id)}
-                      className={`p-3.5 rounded-xl border-2 cursor-pointer transition-all ${
-                        isSelected
-                          ? 'border-blue-600 bg-blue-50/70 shadow-xs'
-                          : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
-                      }`}
-                    >
+            {/* Controlled Admin Role Selection (Only shown when Admin Portal is clicked) */}
+            {isAdminMode && (
+              <div className="p-4 bg-slate-50/90 rounded-xl border border-slate-200/80 space-y-3 animate-in fade-in duration-200">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <ShieldCheck className="w-4 h-4 text-slate-700" />
+                    <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                      Authorized Role Charter <span className="text-rose-500">*</span>
+                    </span>
+                  </div>
+                  <span className="text-[10px] bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-mono font-semibold">
+                    ADMIN
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-500">
+                  Select your assigned municipal role to configure authority permissions:
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {adminRoleOptions.map((opt) => {
+                    const isSelected = role === opt.id;
+                    return (
                       <div
-                        className={`p-2 rounded-lg inline-flex ${
-                          isSelected ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600'
+                        key={opt.id}
+                        onClick={() => setRole(opt.id)}
+                        className={`p-3.5 rounded-xl border-2 cursor-pointer transition-all ${
+                          isSelected
+                            ? 'border-blue-600 bg-white shadow-xs'
+                            : 'border-slate-200 bg-white hover:border-slate-300'
                         }`}
                       >
-                        {opt.icon}
+                        <div
+                          className={`p-2 rounded-lg inline-flex ${
+                            isSelected ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600'
+                          }`}
+                        >
+                          {opt.icon}
+                        </div>
+                        <h4 className="text-xs font-bold text-slate-900 mt-2 font-heading">
+                          {opt.title}
+                        </h4>
+                        <p className="text-[10px] text-slate-500 mt-1 leading-snug">
+                          {opt.description}
+                        </p>
                       </div>
-                      <h4 className="text-xs font-bold text-slate-900 mt-2 font-heading">
-                        {opt.title}
-                      </h4>
-                      <p className="text-[10px] text-slate-500 mt-1 leading-snug">
-                        {opt.description}
-                      </p>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
+                {fieldErrors.role && (
+                  <p className="mt-1 text-xs text-rose-600 font-medium">{fieldErrors.role}</p>
+                )}
               </div>
-              {fieldErrors.role && (
-                <p className="mt-1 text-xs text-rose-600 font-medium">{fieldErrors.role}</p>
-              )}
-            </div>
+            )}
 
             {/* Account Credentials */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
               <Input
                 label="Username"
                 type="text"
@@ -213,10 +241,10 @@ export const RegisterPage: React.FC = () => {
               />
 
               <Input
-                label="Official Email"
+                label={isAdminMode ? 'Official Email' : 'Email Address'}
                 type="email"
                 required
-                placeholder="aditi@example.com"
+                placeholder={isAdminMode ? 'officer@city.gov' : 'aditi@example.com'}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 error={fieldErrors.email}
@@ -257,12 +285,19 @@ export const RegisterPage: React.FC = () => {
                 className="w-full"
                 rightIcon={<ArrowRight className="w-4 h-4" />}
               >
-                {isLoading ? 'Creating Account & Setting Role...' : 'Create Account'}
+                {isLoading
+                  ? isAdminMode
+                    ? 'Registering Authorized Account...'
+                    : 'Creating Account...'
+                  : isAdminMode
+                  ? 'Register Authorized Account'
+                  : 'Create Account'}
               </Button>
             </div>
           </form>
 
-          <div className="mt-6 pt-5 border-t border-slate-100 text-center">
+          {/* Navigation & Subtle Admin Entry */}
+          <div className="mt-6 pt-5 border-t border-slate-100 text-center space-y-2.5">
             <p className="text-xs text-slate-500">
               Already have an account?{' '}
               <Link
@@ -272,6 +307,38 @@ export const RegisterPage: React.FC = () => {
                 Sign In
               </Link>
             </p>
+
+            {/* Subtle, non-intrusive Admin entry */}
+            {!isAdminMode ? (
+              <div className="pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsAdminMode(true);
+                    setRole('project_manager');
+                    setFieldErrors({});
+                  }}
+                  aria-label="Admin and authorized personnel registration"
+                  className="text-[11px] text-slate-400 hover:text-slate-600 transition-colors cursor-pointer focus:outline-hidden focus:underline select-none"
+                >
+                  Admin Portal
+                </button>
+              </div>
+            ) : (
+              <div className="pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsAdminMode(false);
+                    setRole('citizen');
+                    setFieldErrors({});
+                  }}
+                  className="text-[11px] text-blue-600 hover:text-blue-700 font-medium transition-colors cursor-pointer focus:outline-hidden focus:underline select-none"
+                >
+                  &larr; Return to Citizen Registration
+                </button>
+              </div>
+            )}
           </div>
         </div>
 

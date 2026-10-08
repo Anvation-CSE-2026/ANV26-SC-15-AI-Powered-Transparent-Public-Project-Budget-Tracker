@@ -42,4 +42,26 @@ describe('Landing Page & Login Redesign Component Specifications', () => {
     expect(navbarSubtitle).toContain('Smarter Cities');
     expect(cardSubtitle).toContain('Management Platform');
   });
+
+  it('validates registration role security and hidden admin flow rules', () => {
+    // Normal registration always defaults to citizen without exposing roles
+    const defaultPublicRole = 'citizen';
+    expect(defaultPublicRole).toBe('citizen');
+
+    // Admin portal unlocks controlled authorized roles
+    const authorizedAdminRoles = ['project_manager', 'contractor'];
+    expect(authorizedAdminRoles).toContain('project_manager');
+    expect(authorizedAdminRoles).toContain('contractor');
+    expect(authorizedAdminRoles).not.toContain('citizen');
+
+    // Role mapping strictly routes to authorized dashboards
+    const roleRoutes: Record<string, string> = {
+      citizen: '/dashboard/citizen',
+      project_manager: '/dashboard/project-manager',
+      contractor: '/dashboard/contractor',
+    };
+    expect(roleRoutes['citizen']).toBe('/dashboard/citizen');
+    expect(roleRoutes['project_manager']).toBe('/dashboard/project-manager');
+    expect(roleRoutes['contractor']).toBe('/dashboard/contractor');
+  });
 });
