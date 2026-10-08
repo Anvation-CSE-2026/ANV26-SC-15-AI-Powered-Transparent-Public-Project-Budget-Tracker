@@ -60,6 +60,10 @@ import { ContractorSubmissionDetailPage } from './pages/contractor/ContractorSub
 import { ContractorProfilePage } from './pages/contractor/ContractorProfilePage';
 import { ContractorSettingsPage } from './pages/contractor/ContractorSettingsPage';
 
+// Phase 10: Analytics & Risk Engine Pages
+import { AuthorityRiskEnginePage } from './pages/authority/AuthorityRiskEnginePage';
+import { CitizenAnalyticsPage } from './pages/citizen/CitizenAnalyticsPage';
+
 // Root Route Handler
 const RootRoute: React.FC = () => {
   const { isAuthenticated, role, loading } = useAuth();
@@ -323,6 +327,19 @@ export const App: React.FC = () => {
             }
           />
 
+          <Route
+            path="/dashboard/citizen/analytics"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['citizen', 'project_manager']}>
+                  <Layout>
+                    <CitizenAnalyticsPage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
           {/* ========================================================= */}
           {/* AUTHORITY & CONTRACTOR SHELLS (Pending Phases 7 & 8)      */}
           {/* ========================================================= */}
@@ -521,6 +538,20 @@ export const App: React.FC = () => {
                 <RoleGuard allowedRoles={['project_manager']}>
                   <Layout>
                     <AuthorityMapPage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* PHASE 10: AUTHORITY RISK ENGINE & ANOMALY TELEMETRY */}
+          <Route
+            path="/dashboard/project-manager/risk-engine"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['project_manager']}>
+                  <Layout>
+                    <AuthorityRiskEnginePage />
                   </Layout>
                 </RoleGuard>
               </ProtectedRoute>

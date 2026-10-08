@@ -9,6 +9,7 @@ import {
   Building2,
   ExternalLink,
   MapPin,
+  ShieldAlert,
 } from 'lucide-react';
 
 export const QuickActionsBar: React.FC = () => {
@@ -60,6 +61,16 @@ export const QuickActionsBar: React.FC = () => {
           onClick={() => navigate('/dashboard/project-manager/voting/new')}
         >
           Create Poll
+        </Button>
+
+        <Button
+          variant="outline"
+          size="sm"
+          className="text-xs text-rose-700 border-rose-200 hover:bg-rose-50"
+          leftIcon={<ShieldAlert className="w-3.5 h-3.5 text-rose-600" />}
+          onClick={() => navigate('/dashboard/project-manager/risk-engine')}
+        >
+          Risk Engine
         </Button>
 
         <Button

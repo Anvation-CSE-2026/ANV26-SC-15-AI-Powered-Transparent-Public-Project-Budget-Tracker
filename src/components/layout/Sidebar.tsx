@@ -44,6 +44,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const citizenItems: NavItem[] = [
     { id: 'dashboard', label: 'Citizen Dashboard', path: '/dashboard/citizen', icon: <LayoutDashboard className="w-4 h-4" /> },
+    { id: 'city-analytics', label: 'City Analytics & Data', path: '/dashboard/citizen/analytics', icon: <BarChart3 className="w-4 h-4" /> },
     { id: 'complaints', label: 'Complaints & Issues', path: '/dashboard/citizen/complaints', icon: <AlertCircle className="w-4 h-4" /> },
     { id: 'projects', label: 'Public Projects', path: '/dashboard/citizen/projects', icon: <FolderGit2 className="w-4 h-4" />, badge: 'Live' },
     { id: 'map', label: 'Interactive Map', path: '/dashboard/citizen/map', icon: <MapPin className="w-4 h-4" /> },
@@ -56,13 +57,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const authorityItems: NavItem[] = [
     { id: 'authority-center', label: 'PM Command Center', path: '/dashboard/project-manager', icon: <BarChart3 className="w-4 h-4" /> },
+    { id: 'risk-engine', label: 'Risk Engine & Analytics', path: '/dashboard/project-manager/risk-engine', icon: <ShieldAlert className="w-4 h-4" />, badge: 'Anomaly' },
     { id: 'projects-management', label: 'Projects Management', path: '/dashboard/project-manager/projects', icon: <FolderGit2 className="w-4 h-4" />, badge: 'Active' },
     { id: 'complaints-queue', label: 'Complaints Queue', path: '/dashboard/project-manager/complaints', icon: <AlertCircle className="w-4 h-4" />, badge: 'SLA' },
     { id: 'suggestions-queue', label: 'Suggestions Queue', path: '/dashboard/project-manager/suggestions', icon: <Lightbulb className="w-4 h-4" /> },
     { id: 'voting-management', label: 'Civic Polls & Voting', path: '/dashboard/project-manager/voting', icon: <Vote className="w-4 h-4" /> },
     { id: 'contractor-submissions', label: 'Contractor Submissions', path: '/dashboard/project-manager/submissions', icon: <HardHat className="w-4 h-4" />, badge: 'Queue' },
     { id: 'gis-map', label: 'GIS Location Map', path: '/dashboard/project-manager/map', icon: <MapPin className="w-4 h-4" />, badge: 'GIS' },
-    { id: 'risk-engine', label: 'Risk Engine', path: '/design-system', icon: <ShieldAlert className="w-4 h-4" />, badge: 'Anomaly' },
     { id: 'audit-logs', label: 'Audit Trail', path: '/design-system', icon: <History className="w-4 h-4" /> },
   ];
 
