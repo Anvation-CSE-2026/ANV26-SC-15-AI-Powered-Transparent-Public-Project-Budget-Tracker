@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { Eye, Bell, Search, Menu, X, ShieldCheck, LogOut, LogIn } from 'lucide-react';
+import { Eye, Search, Menu, X, ShieldCheck, LogOut, LogIn } from 'lucide-react';
 import { Badge } from '../common/Badge';
 import { useAuth } from '../../hooks/useAuth';
 import { ROLE_DISPLAY_NAMES } from '../../routes/routeConfig';
+import { NotificationBellDropdown } from '../notifications/NotificationBellDropdown';
 
 export interface NavbarProps {
   onToggleSidebar?: () => void;
@@ -14,7 +15,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   onToggleSidebar,
   isSidebarOpen,
 }) => {
-  const [hasUnread] = useState(true);
   const { isAuthenticated, userProfile, role, logout } = useAuth();
 
   const roleName = role ? ROLE_DISPLAY_NAMES[role] : 'Citizen';
@@ -70,19 +70,8 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Right: Actions, Notifications, Role Badge & User Profile */}
         <div className="flex items-center gap-3">
-          {/* Notification Bell */}
-          <button
-            className="relative p-2 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors cursor-pointer"
-            aria-label="View notifications"
-          >
-            <Bell className="w-5 h-5" />
-            {hasUnread && (
-              <span className="absolute top-1.5 right-1.5 flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500" />
-              </span>
-            )}
-          </button>
+          {/* Notification Bell Dropdown */}
+          <NotificationBellDropdown />
 
           {/* User Profile or Sign In Link */}
           {isAuthenticated && userProfile ? (

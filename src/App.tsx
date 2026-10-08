@@ -67,6 +67,10 @@ import { CitizenAnalyticsPage } from './pages/citizen/CitizenAnalyticsPage';
 // Phase 11: Gemini AI Assistant Pages
 import { AuthorityAIPage } from './pages/authority/AuthorityAIPage';
 
+// Phase 12: Notification System Pages
+import { AuthorityNotificationsPage } from './pages/authority/AuthorityNotificationsPage';
+import { ContractorNotificationsPage } from './pages/contractor/ContractorNotificationsPage';
+
 // Root Route Handler
 const RootRoute: React.FC = () => {
   const { isAuthenticated, role, loading } = useAuth();
@@ -575,6 +579,20 @@ export const App: React.FC = () => {
             }
           />
 
+          {/* PHASE 12: AUTHORITY NOTIFICATIONS CENTER */}
+          <Route
+            path="/dashboard/project-manager/notifications"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['project_manager']}>
+                  <Layout>
+                    <AuthorityNotificationsPage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
           {/* ========================================================= */}
           {/* PHASE 8: CONTRACTOR DASHBOARD & WORKFLOW ROUTES           */}
           {/* ========================================================= */}
@@ -676,6 +694,20 @@ export const App: React.FC = () => {
                 <RoleGuard allowedRoles={['contractor']}>
                   <Layout>
                     <ContractorSettingsPage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* PHASE 12: CONTRACTOR NOTIFICATIONS CENTER */}
+          <Route
+            path="/dashboard/contractor/notifications"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['contractor']}>
+                  <Layout>
+                    <ContractorNotificationsPage />
                   </Layout>
                 </RoleGuard>
               </ProtectedRoute>

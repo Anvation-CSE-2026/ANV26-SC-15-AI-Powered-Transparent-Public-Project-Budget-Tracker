@@ -65,6 +65,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'voting-management', label: 'Civic Polls & Voting', path: '/dashboard/project-manager/voting', icon: <Vote className="w-4 h-4" /> },
     { id: 'contractor-submissions', label: 'Contractor Submissions', path: '/dashboard/project-manager/submissions', icon: <HardHat className="w-4 h-4" />, badge: 'Queue' },
     { id: 'gis-map', label: 'GIS Location Map', path: '/dashboard/project-manager/map', icon: <MapPin className="w-4 h-4" />, badge: 'GIS' },
+    { id: 'authority-notifications', label: 'Alerts & Notifications', path: '/dashboard/project-manager/notifications', icon: <Bell className="w-4 h-4" /> },
     { id: 'audit-logs', label: 'Audit Trail', path: '/design-system', icon: <History className="w-4 h-4" /> },
   ];
 
@@ -72,6 +73,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'contractor-dashboard', label: 'Contractor Portal', path: '/dashboard/contractor', icon: <LayoutDashboard className="w-4 h-4" /> },
     { id: 'assigned-projects', label: 'Assigned Projects', path: '/dashboard/contractor/projects', icon: <FolderGit2 className="w-4 h-4" />, badge: 'Charter' },
     { id: 'contractor-submissions', label: 'Work Submissions', path: '/dashboard/contractor/submissions', icon: <HardHat className="w-4 h-4" />, badge: 'Audit' },
+    { id: 'contractor-notifications', label: 'Worksite Notifications', path: '/dashboard/contractor/notifications', icon: <Bell className="w-4 h-4" /> },
   ];
 
   const handleNavigate = (path: string) => {

@@ -21,6 +21,7 @@ import type {
 } from '../types/suggestion';
 import type { UserProfile } from '../types';
 import { generateSuggestionNumber } from '../utils/suggestionIdGenerator';
+import { createNotification } from './notificationService';
 
 const LOCAL_STORAGE_SUGGESTIONS = 'civicsight_local_suggestions';
 const LOCAL_STORAGE_SUGGESTION_UPDATES = 'civicsight_local_suggestion_updates';
@@ -421,6 +422,23 @@ export async function updateSuggestionStatus(
     if (!localUpdates[suggestionId]) localUpdates[suggestionId] = [];
     localUpdates[suggestionId].push(updateLog);
     saveLocalSuggestionUpdates(localUpdates);
+  }
+
+  // Trigger notification to citizen author
+  const s = await getSuggestionById(suggestionId);
+  if (s) {
+    void createNotification({
+      recipientId: s.citizenId,
+      type: 'suggestion_status_changed',
+      category: 'suggestion',
+      title: `Suggestion Status: ${newStatus.replace('_', ' ').toUpperCase()}`,
+      message: message.trim() || `Your suggestion "${s.title}" has been updated to ${newStatus}.`,
+      entityType: 'suggestion',
+      entityId: suggestionId,
+      entityNumber: s.suggestionNumber,
+      actionUrl: `/dashboard/citizen/suggestions/${suggestionId}`,
+      priority: 'normal',
+    });
   }
 }
 

@@ -20,6 +20,7 @@ import type {
 } from '../types/poll';
 import type { UserProfile } from '../types';
 import { validatePollInput, isPollOpenForVoting } from '../utils/pollCalculator';
+import { createNotification } from './notificationService';
 
 const LOCAL_STORAGE_POLLS = 'civicsight_local_polls';
 const LOCAL_STORAGE_VOTES = 'civicsight_local_poll_votes';
@@ -485,6 +486,24 @@ export async function updatePollStatus(
       local[pollId].status = newStatus;
       local[pollId].updatedAt = nowIso;
       saveLocalPolls(local);
+    }
+  }
+
+  // Trigger notification if poll is opened for voting
+  if (newStatus === 'active') {
+    const p = await getPollById(pollId);
+    if (p) {
+      void createNotification({
+        recipientId: 'cit-seed-1',
+        type: 'poll_published',
+        category: 'poll',
+        title: `Public Poll Live: ${p.title}`,
+        message: `Voting is now open for "${p.title}". Make your voice count!`,
+        entityType: 'poll',
+        entityId: pollId,
+        actionUrl: `/dashboard/citizen/voting/${pollId}`,
+        priority: 'normal',
+      });
     }
   }
 }

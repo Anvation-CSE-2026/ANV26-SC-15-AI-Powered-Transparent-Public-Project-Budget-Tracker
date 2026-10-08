@@ -24,6 +24,7 @@ import type {
 import type { UserProfile } from '../types';
 import { generateComplaintNumber } from '../utils/complaintIdGenerator';
 import { calculateSLAStatus } from '../utils/slaCalculator';
+import { createNotification } from './notificationService';
 
 const LOCAL_STORAGE_COMPLAINTS = 'civicsight_local_complaints';
 const LOCAL_STORAGE_UPDATES = 'civicsight_local_complaint_updates';
@@ -401,6 +402,34 @@ export async function createComplaint(
     saveLocalUpdates(localUpdates);
   }
 
+  // Trigger notification for citizen confirmation
+  void createNotification({
+    recipientId: user.uid,
+    type: 'complaint_created',
+    category: 'complaint',
+    title: 'Grievance Registered',
+    message: `Your grievance ${complaintNumber} ("${newComplaint.title}") has been registered and submitted for verification.`,
+    entityType: 'complaint',
+    entityId: complaintId,
+    entityNumber: complaintNumber,
+    actionUrl: `/dashboard/citizen/complaints/${complaintId}`,
+    priority: newComplaint.priority === 'emergency' ? 'urgent' : 'normal',
+  });
+
+  // Trigger alert for Project Manager
+  void createNotification({
+    recipientId: 'pm-seed-1',
+    type: 'authority_alert',
+    category: 'complaint',
+    title: `New Grievance Submitted: ${complaintNumber}`,
+    message: `${user.displayName || user.username} reported "${newComplaint.title}" in ${newComplaint.location.ward || 'the city'}.`,
+    entityType: 'complaint',
+    entityId: complaintId,
+    entityNumber: complaintNumber,
+    actionUrl: `/dashboard/project-manager/complaints/${complaintId}`,
+    priority: newComplaint.priority === 'emergency' ? 'urgent' : 'normal',
+  });
+
   return newComplaint;
 }
 
@@ -688,6 +717,23 @@ export async function assignDepartmentAndOfficer(
     localUpdates[complaintId].push(updateLog);
     saveLocalUpdates(localUpdates);
   }
+
+  // Trigger notification to citizen
+  const c = await getComplaintById(complaintId);
+  if (c) {
+    void createNotification({
+      recipientId: c.citizenId,
+      type: 'complaint_assigned',
+      category: 'complaint',
+      title: `Grievance Assigned: ${c.complaintNumber}`,
+      message: `Your grievance has been assigned to ${deptName} (Officer: ${officerName}) with a ${slaHours}h SLA resolution window.`,
+      entityType: 'complaint',
+      entityId: complaintId,
+      entityNumber: c.complaintNumber,
+      actionUrl: `/dashboard/citizen/complaints/${complaintId}`,
+      priority: priority === 'emergency' ? 'urgent' : 'normal',
+    });
+  }
 }
 
 /**
@@ -731,6 +777,23 @@ export async function updateComplaintStatus(
     if (!localUpdates[complaintId]) localUpdates[complaintId] = [];
     localUpdates[complaintId].push(updateLog);
     saveLocalUpdates(localUpdates);
+  }
+
+  // Trigger notification to citizen
+  const c = await getComplaintById(complaintId);
+  if (c) {
+    void createNotification({
+      recipientId: c.citizenId,
+      type: newStatus === 'resolved' ? 'complaint_resolved' : 'complaint_status_changed',
+      category: 'complaint',
+      title: `Grievance Status: ${newStatus.replace('_', ' ').toUpperCase()}`,
+      message: message || `Status of ${c.complaintNumber} updated to ${newStatus}.`,
+      entityType: 'complaint',
+      entityId: complaintId,
+      entityNumber: c.complaintNumber,
+      actionUrl: `/dashboard/citizen/complaints/${complaintId}`,
+      priority: newStatus === 'in_progress' ? 'high' : 'normal',
+    });
   }
 }
 
@@ -823,6 +886,23 @@ export async function resolveComplaint(
     if (!localUpdates[complaintId]) localUpdates[complaintId] = [];
     localUpdates[complaintId].push(updateLog);
     saveLocalUpdates(localUpdates);
+  }
+
+  // Trigger notification to citizen
+  const c = await getComplaintById(complaintId);
+  if (c) {
+    void createNotification({
+      recipientId: c.citizenId,
+      type: 'complaint_resolved',
+      category: 'complaint',
+      title: `Grievance Resolved: ${c.complaintNumber}`,
+      message: `Work completed: ${summary}`,
+      entityType: 'complaint',
+      entityId: complaintId,
+      entityNumber: c.complaintNumber,
+      actionUrl: `/dashboard/citizen/complaints/${complaintId}`,
+      priority: 'high',
+    });
   }
 }
 

@@ -29,6 +29,7 @@ import {
   addProjectUpdate,
   updateMilestone,
 } from './projectService';
+import { createNotification } from './notificationService';
 
 const LOCAL_STORAGE_SUBMISSIONS = 'civicsight_local_contractor_submissions';
 
@@ -250,7 +251,6 @@ export async function createContractorSubmission(
   if (isFirebaseConfigured && db) {
     try {
       await setDoc(doc(db, 'projectSubmissions', submissionId), submission);
-      return submission;
     } catch {
       // fallback to local storage
     }
@@ -259,6 +259,34 @@ export async function createContractorSubmission(
   const local = getLocalSubmissions();
   local[submissionId] = submission;
   saveLocalSubmissions(local);
+
+  // Trigger alert for Project Manager
+  void createNotification({
+    recipientId: 'pm-seed-1',
+    type: 'contractor_submission_received',
+    category: 'contractor',
+    title: `New Contractor Submission: ${submissionNumber}`,
+    message: `${contractorUser.displayName || contractorUser.username} submitted "${submission.title}" for ${project.name}.`,
+    entityType: 'submission',
+    entityId: submissionId,
+    entityNumber: submissionNumber,
+    actionUrl: `/dashboard/project-manager/submissions/${submissionId}`,
+    priority: submission.delay?.isDelayed ? 'high' : 'normal',
+  });
+
+  // Trigger confirmation for Contractor
+  void createNotification({
+    recipientId: contractorUser.uid,
+    type: 'contractor_submission_received',
+    category: 'contractor',
+    title: `Submission Received: ${submissionNumber}`,
+    message: `Your update "${submission.title}" for ${project.name} has been queued for PM audit review.`,
+    entityType: 'submission',
+    entityId: submissionId,
+    entityNumber: submissionNumber,
+    actionUrl: `/dashboard/contractor/submissions/${submissionId}`,
+    priority: 'normal',
+  });
 
   return submission;
 }
@@ -558,8 +586,31 @@ export async function reviewSubmission(
   local[submission.id] = updatedSubmission;
   saveLocalSubmissions(local);
 
+  // Trigger decision notification to Contractor
+  void createNotification({
+    recipientId: submission.contractorId,
+    type:
+      input.decision === 'Approved'
+        ? 'contractor_submission_approved'
+        : input.decision === 'Rejected'
+        ? 'contractor_submission_rejected'
+        : 'contractor_submission_changes_requested',
+    category: 'contractor',
+    title: `Submission ${input.decision}: ${submission.submissionNumber}`,
+    message:
+      input.remarks?.trim() ||
+      `Your submission for ${submission.projectName} was marked as ${input.decision}.`,
+    entityType: 'submission',
+    entityId: submission.id,
+    entityNumber: submission.submissionNumber,
+    actionUrl: `/dashboard/contractor/submissions/${submission.id}`,
+    priority: input.decision === 'Approved' ? 'normal' : 'high',
+  });
+
   return updatedSubmission;
 }
+
+export const reviewContractorSubmission = reviewSubmission;
 
 /**
  * Calculates high-level real KPI metrics for authenticated contractor.

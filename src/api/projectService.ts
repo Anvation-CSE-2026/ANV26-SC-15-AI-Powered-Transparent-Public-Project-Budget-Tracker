@@ -29,6 +29,7 @@ import type {
 import type { UserProfile } from '../types';
 import { generateProjectNumber } from '../utils/projectIdGenerator';
 import { calculateBudgetDeviation, calculateDelayDays, calculateCivicSightRisk } from '../utils/calculations';
+import { createNotification } from './notificationService';
 
 const LOCAL_STORAGE_PROJECTS = 'civicsight_local_projects';
 const LOCAL_STORAGE_MILESTONES = 'civicsight_local_project_milestones';
@@ -1130,6 +1131,23 @@ export async function updateMilestone(
     saveLocalProjects(projects);
   }
 
+  // Trigger notification if milestone is completed
+  if (updated.status.toLowerCase() === 'completed') {
+    const proj = projects[projectId];
+    void createNotification({
+      recipientId: 'pm-seed-1',
+      type: 'project_milestone_completed',
+      category: 'project',
+      title: `Milestone Completed: ${updated.title}`,
+      message: `Milestone "${updated.title}" for ${proj ? proj.name : 'project'} was officially completed.`,
+      entityType: 'project',
+      entityId: projectId,
+      entityNumber: proj ? proj.projectNumber : undefined,
+      actionUrl: `/dashboard/project-manager/projects/${projectId}`,
+      priority: 'normal',
+    });
+  }
+
   await logProjectActivity(
     projectId,
     'MILESTONE_UPDATED',
@@ -1348,6 +1366,21 @@ export async function addProjectIssue(
     `Logged ${input.severity} severity issue: "${newIssue.title}"`,
     actor
   );
+
+  // Trigger alert for Project Manager if high/critical severity
+  if (input.severity === 'Critical' || input.severity === 'High') {
+    void createNotification({
+      recipientId: 'pm-seed-1',
+      type: 'project_issue_logged',
+      category: 'project',
+      title: `Project Issue Logged: ${input.severity}`,
+      message: `${actor.displayName || actor.username} logged ${input.severity.toLowerCase()} issue "${newIssue.title}".`,
+      entityType: 'project',
+      entityId: projectId,
+      actionUrl: `/dashboard/project-manager/projects/${projectId}`,
+      priority: input.severity === 'Critical' ? 'urgent' : 'high',
+    });
+  }
 
   return newIssue;
 }
