@@ -5,18 +5,14 @@ import { MobileNavigation } from './MobileNavigation';
 
 export interface LayoutProps {
   children: React.ReactNode;
-  activeTab: string;
-  onSelectTab: (tabId: string) => void;
-  activeRole?: string;
-  onRoleSwitch?: (role: string) => void;
+  activeTab?: string;
+  onSelectTab?: (tabId: string) => void;
 }
 
 export const Layout: React.FC<LayoutProps> = ({
   children,
-  activeTab,
-  onSelectTab,
-  activeRole = 'Citizen',
-  onRoleSwitch,
+  activeTab = 'dashboard',
+  onSelectTab = () => {},
 }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -26,8 +22,6 @@ export const Layout: React.FC<LayoutProps> = ({
       <Navbar
         isSidebarOpen={isSidebarOpen}
         onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
-        activeRole={activeRole}
-        onRoleSwitch={onRoleSwitch}
       />
 
       {/* Main Container */}

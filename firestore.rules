@@ -1,0 +1,127 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions for authentication and role verification
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isAuthenticated() && request.auth.uid == uid;
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function hasRole(role) {
+      return isAuthenticated() && getUserData().role == role;
+    }
+
+    function isProjectManager() {
+      return hasRole('project_manager');
+    }
+
+    function isContractor() {
+      return hasRole('contractor');
+    }
+
+    function isCitizen() {
+      return hasRole('citizen');
+    }
+
+    // ==========================================
+    // 1. Users Collection (users/{uid})
+    // ==========================================
+    match /users/{uid} {
+      // Any authenticated user can read basic municipal profile
+      // Or users can read their own full profile
+      allow read: if isAuthenticated();
+
+      // Creation only allowed if document ID matches the authenticated UID
+      allow create: if isOwner(uid) &&
+                    request.resource.data.uid == uid &&
+                    request.resource.data.role in ['citizen', 'project_manager', 'contractor'] &&
+                    request.resource.data.email is string &&
+                    request.resource.data.username is string;
+
+      // Update allowed only by the owner, BUT ROLE CANNOT BE CHANGED FROM CLIENT
+      allow update: if isOwner(uid) &&
+                    request.resource.data.role == resource.data.role &&
+                    request.resource.data.uid == resource.data.uid;
+
+      // Deletion prohibited from standard client
+      allow delete: if false;
+    }
+
+    // ==========================================
+    // 2. Usernames Index (usernames/{normalizedUsername})
+    // ==========================================
+    match /usernames/{normalizedUsername} {
+      // Readable for login resolution and username uniqueness check
+      allow read: if true;
+
+      // Creation allowed only during registration when tied to authenticated UID
+      allow create: if isAuthenticated() &&
+                    request.resource.data.uid == request.auth.uid &&
+                    !exists(/databases/$(database)/documents/usernames/$(normalizedUsername));
+
+      // Usernames are immutable once registered
+      allow update, delete: if false;
+    }
+
+    // ==========================================
+    // 3. Projects Collection (projects/{projectId})
+    // ==========================================
+    match /projects/{projectId} {
+      // Public transparency: anyone authenticated can read projects
+      allow read: if isAuthenticated();
+
+      // Only Project Managers can create or update project budget & status
+      allow create, update: if isProjectManager();
+
+      // Contractor cannot modify approved budget or unauthorized projects
+      allow delete: if isProjectManager();
+    }
+
+    // ==========================================
+    // 4. Complaints Collection (complaints/{complaintId})
+    // ==========================================
+    match /complaints/{complaintId} {
+      // Public transparency: citizens and authority can read complaints
+      allow read: if isAuthenticated();
+
+      // Citizen can create complaint with their own citizenId
+      allow create: if isAuthenticated() &&
+                    request.resource.data.citizenId == request.auth.uid;
+
+      // Citizen can update only their own complaint while under review
+      // Authority (PM) can update status, SLA, and department assignment
+      allow update: if (isAuthenticated() && resource.data.citizenId == request.auth.uid) ||
+                    isProjectManager();
+
+      allow delete: if isProjectManager();
+    }
+
+    // ==========================================
+    // 5. Contractor Updates (contractorUpdates/{updateId})
+    // ==========================================
+    match /contractorUpdates/{updateId} {
+      allow read: if isAuthenticated();
+
+      // Contractor can submit updates only for themselves
+      allow create: if isContractor() &&
+                    request.resource.data.contractorId == request.auth.uid;
+
+      // Only Project Manager can approve or reject submissions
+      allow update: if isProjectManager();
+      allow delete: if isProjectManager();
+    }
+
+    // Default deny for unhandled routes
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

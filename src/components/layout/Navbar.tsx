@@ -1,20 +1,23 @@
 import React, { useState } from 'react';
-import { Eye, Bell, Search, Menu, X, ShieldCheck } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Eye, Bell, Search, Menu, X, ShieldCheck, LogOut, LogIn } from 'lucide-react';
 import { Badge } from '../common/Badge';
+import { useAuth } from '../../hooks/useAuth';
+import { ROLE_DISPLAY_NAMES } from '../../routes/routeConfig';
 
 export interface NavbarProps {
   onToggleSidebar?: () => void;
   isSidebarOpen?: boolean;
-  activeRole?: string;
-  onRoleSwitch?: (role: string) => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   onToggleSidebar,
   isSidebarOpen,
-  activeRole = 'Citizen',
 }) => {
   const [hasUnread] = useState(true);
+  const { isAuthenticated, userProfile, role, logout } = useAuth();
+
+  const roleName = role ? ROLE_DISPLAY_NAMES[role] : 'Citizen';
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-200/80 bg-white/95 backdrop-blur-md">
@@ -31,7 +34,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           )}
 
-          <div className="flex items-center gap-2.5">
+          <Link to="/" className="flex items-center gap-2.5">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-700 to-indigo-600 text-white shadow-md shadow-blue-500/20">
               <Eye className="w-5 h-5" />
             </div>
@@ -48,7 +51,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 AI-Powered Transparent Public Project & Budget Tracker
               </p>
             </div>
-          </div>
+          </Link>
         </div>
 
         {/* Center: Global Search Bar */}
@@ -65,7 +68,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
 
-        {/* Right: Actions, Notifications, Role Badge */}
+        {/* Right: Actions, Notifications, Role Badge & User Profile */}
         <div className="flex items-center gap-3">
           {/* Notification Bell */}
           <button
@@ -81,13 +84,43 @@ export const Navbar: React.FC<NavbarProps> = ({
             )}
           </button>
 
-          {/* Active View / Portal Indicator */}
-          <div className="hidden sm:flex items-center gap-2 pl-2 border-l border-slate-200">
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold">
-              <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
-              <span>{activeRole} Portal</span>
+          {/* User Profile or Sign In Link */}
+          {isAuthenticated && userProfile ? (
+            <div className="flex items-center gap-2 pl-2 border-l border-slate-200">
+              <div className="hidden sm:flex flex-col text-right">
+                <span className="text-xs font-bold text-slate-800 leading-tight">
+                  {userProfile.displayName || userProfile.username}
+                </span>
+                <span className="text-[10px] text-blue-600 font-semibold uppercase">
+                  {roleName}
+                </span>
+              </div>
+
+              <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold">
+                <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+                <span>{roleName}</span>
+              </div>
+
+              <button
+                onClick={() => logout()}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer ml-1"
+                title="Sign Out"
+                aria-label="Sign Out"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
             </div>
-          </div>
+          ) : (
+            <div className="flex items-center gap-2 pl-2 border-l border-slate-200">
+              <Link
+                to="/login"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition-colors shadow-xs"
+              >
+                <LogIn className="w-3.5 h-3.5" />
+                <span>Sign In</span>
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </header>
