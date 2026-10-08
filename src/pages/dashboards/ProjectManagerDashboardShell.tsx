@@ -73,9 +73,46 @@ export const ProjectManagerDashboardShell: React.FC = () => {
               Role Route Guard Active: Project Manager Dashboard (/dashboard/project-manager)
             </p>
             <p className="text-amber-800 text-[11px]">
-              Complete Authority Command Center (Budget Monitoring, Contractor Review Queue, SLA Escalation, and Audit Trail) will be activated in Phase 7 per project specifications.
+              Complete Authority Command Center (Budget Monitoring, Contractor Review Queue, and Audit Trail) will be activated in Phase 7 per project specifications.
             </p>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* PHASE 4: COMPLAINTS & GRIEVANCE DISPATCH MODULE */}
+      <Card className="border-blue-200 bg-gradient-to-br from-white to-blue-50/30">
+        <CardHeader>
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <Badge variant="info" size="sm">Phase 4 Active Module</Badge>
+              <Badge variant="success" size="sm">Live Municipal Dispatch</Badge>
+            </div>
+            <CardTitle>Citizen Grievance &amp; Complaints Management</CardTitle>
+            <CardDescription>
+              Review city-wide citizen reports, assign responsible departments and officers, enforce SLA countdowns, and verify resolution proof.
+            </CardDescription>
+          </div>
+        </CardHeader>
+        <CardContent className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-2">
+          <div className="text-xs text-slate-600 space-y-1">
+            <p className="font-semibold text-slate-800">Available Authority Actions:</p>
+            <ul className="list-disc list-inside text-slate-500 space-y-0.5">
+              <li>Acknowledge &amp; verify incoming civic complaints</li>
+              <li>Dispatch to Roads, Drainage, Water, Electrical, Sanitation &amp; Traffic depts</li>
+              <li>Schedule resolution SLA deadlines and monitor overdue timers</li>
+              <li>Post public updates &amp; record confidential internal memos</li>
+              <li>Upload official resolution proof and receive citizen satisfaction ratings</li>
+            </ul>
+          </div>
+
+          <Button
+            variant="primary"
+            size="md"
+            className="bg-blue-600 hover:bg-blue-500 shadow-md shadow-blue-500/20 shrink-0"
+            onClick={() => window.location.assign('/dashboard/project-manager/complaints')}
+          >
+            Open Complaints Queue &rarr;
+          </Button>
         </CardContent>
       </Card>
     </div>

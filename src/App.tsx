@@ -21,6 +21,8 @@ import { CitizenDashboard } from './dashboards/citizen/CitizenDashboard';
 import { CitizenProfilePage } from './pages/citizen/CitizenProfilePage';
 import { CitizenSettingsPage } from './pages/citizen/CitizenSettingsPage';
 import { CitizenComplaintsPage } from './pages/citizen/CitizenComplaintsPage';
+import { CreateComplaintPage } from './pages/citizen/CreateComplaintPage';
+import { CitizenComplaintDetailPage } from './pages/citizen/CitizenComplaintDetailPage';
 import { CitizenSuggestionsPage } from './pages/citizen/CitizenSuggestionsPage';
 import { CitizenVotingPage } from './pages/citizen/CitizenVotingPage';
 import { CitizenProjectsPage } from './pages/citizen/CitizenProjectsPage';
@@ -29,8 +31,10 @@ import { CitizenAnnouncementsPage } from './pages/citizen/CitizenAnnouncementsPa
 import { CitizenNotificationsPage } from './pages/citizen/CitizenNotificationsPage';
 import { CitizenAIPage } from './pages/citizen/CitizenAIPage';
 
-// Authority & Contractor Placeholder Shells (Activated in Phases 7 & 8)
+// Authority Management Pages
 import { ProjectManagerDashboardShell } from './pages/dashboards/ProjectManagerDashboardShell';
+import { AuthorityComplaintsQueuePage } from './pages/authority/AuthorityComplaintsQueuePage';
+import { AuthorityComplaintDetailPage } from './pages/authority/AuthorityComplaintDetailPage';
 import { ContractorDashboardShell } from './pages/dashboards/ContractorDashboardShell';
 
 // Root Route Handler
@@ -125,6 +129,32 @@ export const App: React.FC = () => {
                 <RoleGuard allowedRoles={['citizen']}>
                   <Layout>
                     <CitizenComplaintsPage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/citizen/complaints/new"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['citizen']}>
+                  <Layout>
+                    <CreateComplaintPage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/citizen/complaints/:complaintId"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['citizen']}>
+                  <Layout>
+                    <CitizenComplaintDetailPage />
                   </Layout>
                 </RoleGuard>
               </ProtectedRoute>
@@ -232,6 +262,32 @@ export const App: React.FC = () => {
                 <RoleGuard allowedRoles={['project_manager']}>
                   <Layout>
                     <ProjectManagerDashboardShell />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/project-manager/complaints"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['project_manager']}>
+                  <Layout>
+                    <AuthorityComplaintsQueuePage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/project-manager/complaints/:complaintId"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['project_manager']}>
+                  <Layout>
+                    <AuthorityComplaintDetailPage />
                   </Layout>
                 </RoleGuard>
               </ProtectedRoute>

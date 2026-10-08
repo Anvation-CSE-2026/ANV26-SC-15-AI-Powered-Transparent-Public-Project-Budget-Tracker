@@ -45,6 +45,35 @@ export async function getCitizenStats(userId: string): Promise<CitizenDashboardS
     }
   }
 
+  // Local storage fallback
+  try {
+    const raw = sessionStorage.getItem('civicsight_local_complaints');
+    if (raw) {
+      const allComplaints = Object.values(JSON.parse(raw)) as Array<{
+        citizenId: string;
+        status: string;
+      }>;
+      const userComplaints = allComplaints.filter((c) => c.citizenId === userId);
+      const pending = userComplaints.filter(
+        (c) => c.status !== 'resolved' && c.status !== 'closed'
+      ).length;
+      const resolved = userComplaints.filter(
+        (c) => c.status === 'resolved' || c.status === 'closed'
+      ).length;
+
+      return {
+        myComplaintsCount: userComplaints.length,
+        pendingComplaintsCount: pending,
+        resolvedComplaintsCount: resolved,
+        activeVotesCount: 2,
+        nearbyIssuesCount: 4,
+        projectUpdatesCount: 2,
+      };
+    }
+  } catch {
+    // ignore
+  }
+
   // Initial zero-state for new citizens
   return {
     myComplaintsCount: 0,
@@ -71,7 +100,7 @@ export async function getCitizenRecentComplaints(userId: string): Promise<Compla
         const data = docSnap.data();
         return {
           id: docSnap.id,
-          trackingNumber: data.trackingNumber || `CMP-${docSnap.id.substring(0, 6).toUpperCase()}`,
+          trackingNumber: data.complaintNumber || data.trackingNumber || `CMP-${docSnap.id.substring(0, 6).toUpperCase()}`,
           title: data.title || 'Civic Issue',
           category: data.category || 'General',
           status: data.status || 'submitted',
@@ -84,6 +113,44 @@ export async function getCitizenRecentComplaints(userId: string): Promise<Compla
     } catch (err) {
       console.warn('[CivicSight] Error querying recent complaints:', err);
     }
+  }
+
+  // Local storage fallback
+  try {
+    const raw = sessionStorage.getItem('civicsight_local_complaints');
+    if (raw) {
+      const allComplaints = Object.values(JSON.parse(raw)) as Array<{
+        id: string;
+        citizenId: string;
+        complaintNumber?: string;
+        trackingNumber?: string;
+        title: string;
+        category: string;
+        status: string;
+        priority: string;
+        location?: { address: string };
+        createdAt: string;
+        updatedAt: string;
+      }>;
+      const userComplaints = allComplaints
+        .filter((c) => c.citizenId === userId)
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice(0, 5);
+
+      return userComplaints.map((c) => ({
+        id: c.id,
+        trackingNumber: c.complaintNumber || c.trackingNumber || `CMP-${c.id.substring(0, 6).toUpperCase()}`,
+        title: c.title,
+        category: c.category,
+        status: (c.status as ComplaintSummary['status']) || 'submitted',
+        priority: (c.priority as ComplaintSummary['priority']) || 'medium',
+        location: c.location?.address || 'Municipal Ward',
+        createdAt: c.createdAt,
+        updatedAt: c.updatedAt,
+      }));
+    }
+  } catch {
+    // ignore
   }
 
   // Returns empty array for newly registered citizens so empty state is triggered

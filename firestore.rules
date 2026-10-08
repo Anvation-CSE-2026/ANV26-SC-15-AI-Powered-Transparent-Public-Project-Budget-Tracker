@@ -102,6 +102,25 @@ service cloud.firestore {
                     isProjectManager();
 
       allow delete: if isProjectManager();
+
+      // Updates and Audit Timeline Subcollection
+      match /updates/{updateId} {
+        // Public updates are visible to all authenticated users
+        // Internal notes (isInternal == true) are strictly restricted to project managers
+        allow read: if isAuthenticated() && (
+          isProjectManager() ||
+          resource.data.isInternal == false
+        );
+
+        // Authenticated users can log lifecycle events (citizens log submissions & feedback ratings)
+        // Project managers can post public updates and internal notes
+        allow create: if isAuthenticated() && (
+          isProjectManager() ||
+          request.resource.data.actorId == request.auth.uid
+        );
+
+        allow update, delete: if isProjectManager();
+      }
     }
 
     // ==========================================
