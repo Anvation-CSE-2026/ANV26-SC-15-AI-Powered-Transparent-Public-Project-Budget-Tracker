@@ -56,6 +56,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const authorityItems: NavItem[] = [
     { id: 'authority-center', label: 'PM Command Center', path: '/dashboard/project-manager', icon: <BarChart3 className="w-4 h-4" /> },
+    { id: 'projects-management', label: 'Projects Management', path: '/dashboard/project-manager/projects', icon: <FolderGit2 className="w-4 h-4" />, badge: 'Active' },
     { id: 'complaints-queue', label: 'Complaints Queue', path: '/dashboard/project-manager/complaints', icon: <AlertCircle className="w-4 h-4" />, badge: 'SLA' },
     { id: 'suggestions-queue', label: 'Suggestions Queue', path: '/dashboard/project-manager/suggestions', icon: <Lightbulb className="w-4 h-4" /> },
     { id: 'voting-management', label: 'Civic Polls & Voting', path: '/dashboard/project-manager/voting', icon: <Vote className="w-4 h-4" /> },

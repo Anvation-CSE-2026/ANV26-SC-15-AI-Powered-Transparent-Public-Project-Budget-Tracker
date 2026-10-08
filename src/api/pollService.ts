@@ -109,7 +109,7 @@ export async function createPoll(
     const newDocRef = doc(collection(db, 'polls'));
     pollId = newDocRef.id;
   } else {
-    pollId = `poll_${Date.now()}`;
+    pollId = `poll_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
   }
 
   const cleanOptions = input.options.map((label, index) => ({

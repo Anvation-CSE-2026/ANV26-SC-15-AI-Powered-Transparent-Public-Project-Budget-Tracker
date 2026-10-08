@@ -29,6 +29,7 @@ import { CitizenSuggestionDetailPage } from './pages/citizen/CitizenSuggestionDe
 import { CitizenVotingPage } from './pages/citizen/CitizenVotingPage';
 import { CitizenPollDetailPage } from './pages/citizen/CitizenPollDetailPage';
 import { CitizenProjectsPage } from './pages/citizen/CitizenProjectsPage';
+import { CitizenProjectDetailPage } from './pages/citizen/CitizenProjectDetailPage';
 import { CitizenMapPage } from './pages/citizen/CitizenMapPage';
 import { CitizenAnnouncementsPage } from './pages/citizen/CitizenAnnouncementsPage';
 import { CitizenNotificationsPage } from './pages/citizen/CitizenNotificationsPage';
@@ -43,6 +44,10 @@ import { AuthoritySuggestionDetailPage } from './pages/authority/AuthoritySugges
 import { AuthorityPollsManagementPage } from './pages/authority/AuthorityPollsManagementPage';
 import { CreatePollPage } from './pages/authority/CreatePollPage';
 import { AuthorityPollDetailPage } from './pages/authority/AuthorityPollDetailPage';
+import { AuthorityProjectsPage } from './pages/authority/AuthorityProjectsPage';
+import { CreateProjectPage } from './pages/authority/CreateProjectPage';
+import { AuthorityProjectDetailPage } from './pages/authority/AuthorityProjectDetailPage';
+import { EditProjectPage } from './pages/authority/EditProjectPage';
 import { ContractorDashboardShell } from './pages/dashboards/ContractorDashboardShell';
 
 // Root Route Handler
@@ -248,6 +253,19 @@ export const App: React.FC = () => {
           />
 
           <Route
+            path="/dashboard/citizen/projects/:projectId"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['citizen']}>
+                  <Layout>
+                    <CitizenProjectDetailPage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
             path="/dashboard/citizen/map"
             element={
               <ProtectedRoute>
@@ -401,6 +419,61 @@ export const App: React.FC = () => {
                 <RoleGuard allowedRoles={['project_manager']}>
                   <Layout>
                     <AuthorityPollDetailPage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* ========================================================= */}
+          {/* PHASE 6: AUTHORITY PROJECT MANAGEMENT ROUTES               */}
+          {/* ========================================================= */}
+          <Route
+            path="/dashboard/project-manager/projects"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['project_manager']}>
+                  <Layout>
+                    <AuthorityProjectsPage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/project-manager/projects/new"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['project_manager']}>
+                  <Layout>
+                    <CreateProjectPage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/project-manager/projects/:projectId"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['project_manager']}>
+                  <Layout>
+                    <AuthorityProjectDetailPage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/project-manager/projects/:projectId/edit"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['project_manager']}>
+                  <Layout>
+                    <EditProjectPage />
                   </Layout>
                 </RoleGuard>
               </ProtectedRoute>

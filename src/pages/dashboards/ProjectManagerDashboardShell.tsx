@@ -187,6 +187,42 @@ export const ProjectManagerDashboardShell: React.FC = () => {
           </Button>
         </CardContent>
       </Card>
+
+      {/* PHASE 6: CAPITAL PROJECTS & BUDGET MANAGEMENT MODULE */}
+      <Card className="border-emerald-200 bg-gradient-to-br from-white to-emerald-50/30">
+        <CardHeader>
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <Badge variant="success" size="sm">Phase 6 Active Module</Badge>
+              <Badge variant="info" size="sm">Capital Works &amp; Transparency</Badge>
+            </div>
+            <CardTitle>Capital Projects &amp; Budget Management</CardTitle>
+            <CardDescription>
+              Sanction capital infrastructure projects, assign contractor charters, track milestone deliveries with stage-gate verification, and publish citizen transparency updates.
+            </CardDescription>
+          </div>
+        </CardHeader>
+        <CardContent className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-2">
+          <div className="text-xs text-slate-600 space-y-1">
+            <p className="font-semibold text-slate-800">Available Authority Actions:</p>
+            <ul className="list-disc list-inside text-slate-500 space-y-0.5">
+              <li>Auto-generate unique PRJ-YYYY-XXXXX municipal tracking identifiers</li>
+              <li>Manage approved capital allocations vs. audited actual contractor spending</li>
+              <li>Stage-gate milestone tracking with progress percentages and timeline variance</li>
+              <li>Issue public transparency dispatches or record confidential internal engineering memos</li>
+            </ul>
+          </div>
+
+          <Button
+            variant="primary"
+            size="md"
+            className="bg-emerald-600 hover:bg-emerald-500 shadow-md shadow-emerald-500/20 shrink-0 text-white"
+            onClick={() => window.location.assign('/dashboard/project-manager/projects')}
+          >
+            Manage Capital Projects &rarr;
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 };

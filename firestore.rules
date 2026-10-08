@@ -75,14 +75,62 @@ service cloud.firestore {
     // 3. Projects Collection (projects/{projectId})
     // ==========================================
     match /projects/{projectId} {
-      // Public transparency: anyone authenticated can read projects
-      allow read: if isAuthenticated();
+      // Public transparency: anyone authenticated can read public projects; Project Managers can read all
+      allow read: if isAuthenticated() && (
+        isProjectManager() ||
+        resource.data.isPublic == true
+      );
 
-      // Only Project Managers can create or update project budget & status
-      allow create, update: if isProjectManager();
+      // Only Project Managers can create, update or delete projects
+      allow create, update, delete: if isProjectManager();
 
-      // Contractor cannot modify approved budget or unauthorized projects
-      allow delete: if isProjectManager();
+      // Milestones Subcollection
+      match /milestones/{milestoneId} {
+        allow read: if isAuthenticated();
+        allow create, update, delete: if isProjectManager();
+      }
+
+      // Updates Subcollection (Strict Citizen Isolation)
+      match /updates/{updateId} {
+        // Citizens can only read updates with visibility 'Public'
+        // Internal staff memos are strictly restricted to project managers
+        allow read: if isAuthenticated() && (
+          isProjectManager() ||
+          resource.data.visibility in ['Public', 'public']
+        );
+        allow create, update, delete: if isProjectManager();
+      }
+
+      // Issues Subcollection
+      match /issues/{issueId} {
+        allow read: if isAuthenticated();
+        allow create, update, delete: if isProjectManager();
+      }
+
+      // Documents Subcollection
+      match /documents/{docId} {
+        allow read: if isAuthenticated() && (
+          isProjectManager() ||
+          resource.data.isPublic == true
+        );
+        allow create, update, delete: if isProjectManager();
+      }
+
+      // Photos Subcollection
+      match /photos/{photoId} {
+        allow read: if isAuthenticated() && (
+          isProjectManager() ||
+          resource.data.isPublic == true
+        );
+        allow create, update, delete: if isProjectManager();
+      }
+
+      // Audit Activity Trail Subcollection
+      match /activity/{activityId} {
+        allow read: if isProjectManager();
+        allow create: if isProjectManager();
+        allow update, delete: if false;
+      }
     }
 
     // ==========================================

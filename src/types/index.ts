@@ -15,62 +15,32 @@ export interface UserProfile {
   isActive: boolean;
 }
 
-export type ProjectStatus = 'upcoming' | 'ongoing' | 'delayed' | 'completed' | 'at_risk';
+import type { ProjectLocation } from './project';
 
-export type RiskLevel = 'Normal' | 'Attention' | 'High Attention';
+export type {
+  RiskLevel,
+  ProjectLocation,
+  ProjectCategory,
+  ProjectStatus,
+  MilestoneStatus,
+  ProjectMilestone,
+  UpdateVisibility,
+  ProjectUpdate,
+  IssueSeverity,
+  IssueStatus,
+  ProjectIssue,
+  ProjectDocument,
+  ProjectPhoto,
+  ProjectActivity,
+  Project,
+  CreateProjectInput,
+  UpdateProjectInput,
+  CreateMilestoneInput,
+  CreateProjectUpdateInput,
+  CreateProjectIssueInput,
+} from './project';
 
-export interface ProjectLocation {
-  address: string;
-  city: string;
-  ward?: string;
-  latitude: number;
-  longitude: number;
-}
-
-export interface Project {
-  id: string;
-  name: string;
-  description: string;
-  department: string;
-  projectManagerId: string;
-  projectManagerName: string;
-  contractorId: string;
-  contractorName: string;
-  location: ProjectLocation;
-  startDate: string;
-  plannedCompletionDate: string;
-  expectedCompletionDate: string;
-  actualCompletionDate?: string;
-  approvedBudget: number; // in Crores (Cr) or raw numerical
-  estimatedCost: number;
-  actualSpending: number;
-  progress: number; // 0 - 100 percentage
-  expectedProgress: number; // 0 - 100 percentage
-  budgetDeviation: number; // ((actualSpending - approvedBudget) / approvedBudget) * 100
-  delayDays: number;
-  unresolvedIssues: number;
-  totalIssues: number;
-  riskScore: number; // 0 - 4
-  riskLabel: RiskLevel;
-  status: ProjectStatus;
-  category: string;
-  documents?: string[];
-  photos?: string[];
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface Milestone {
-  id: string;
-  projectId: string;
-  title: string;
-  description: string;
-  plannedDate: string;
-  actualDate?: string;
-  delayDays: number;
-  status: 'pending' | 'in_progress' | 'completed' | 'delayed';
-  progressPercentage: number;
-}
+export type Milestone = import('./project').ProjectMilestone;
 
 export type ComplaintCategory =
   | 'Roads'
