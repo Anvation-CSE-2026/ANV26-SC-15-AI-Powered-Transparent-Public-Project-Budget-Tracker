@@ -5,15 +5,9 @@ import { MobileNavigation } from './MobileNavigation';
 
 export interface LayoutProps {
   children: React.ReactNode;
-  activeTab?: string;
-  onSelectTab?: (tabId: string) => void;
 }
 
-export const Layout: React.FC<LayoutProps> = ({
-  children,
-  activeTab = 'dashboard',
-  onSelectTab = () => {},
-}) => {
+export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
@@ -29,13 +23,11 @@ export const Layout: React.FC<LayoutProps> = ({
         {/* Sidebar */}
         <Sidebar
           isOpen={isSidebarOpen}
-          activeTab={activeTab}
-          onSelectTab={onSelectTab}
           onClose={() => setIsSidebarOpen(false)}
         />
 
         {/* Content View */}
-        <main className="flex-1 lg:pl-64 flex flex-col min-w-0 pb-16 lg:pb-8">
+        <main className="flex-1 lg:pl-64 flex flex-col min-w-0 pb-20 lg:pb-8">
           <div className="flex-1 px-4 sm:px-6 lg:px-8 py-6 max-w-7xl w-full mx-auto">
             {children}
           </div>
@@ -59,7 +51,9 @@ export const Layout: React.FC<LayoutProps> = ({
       </div>
 
       {/* Mobile Bottom Navigation */}
-      <MobileNavigation activeTab={activeTab} onSelectTab={onSelectTab} />
+      <MobileNavigation />
     </div>
   );
 };
+
+export default Layout;

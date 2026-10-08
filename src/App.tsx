@@ -16,12 +16,24 @@ import { UnauthorizedPage } from './pages/auth/UnauthorizedPage';
 // Design System Showcase
 import { DesignSystemShowcase } from './pages/DesignSystemShowcase';
 
-// Dashboard Shells
-import { CitizenDashboardShell } from './pages/dashboards/CitizenDashboardShell';
+// Citizen Dashboard & Modules
+import { CitizenDashboard } from './dashboards/citizen/CitizenDashboard';
+import { CitizenProfilePage } from './pages/citizen/CitizenProfilePage';
+import { CitizenSettingsPage } from './pages/citizen/CitizenSettingsPage';
+import { CitizenComplaintsPage } from './pages/citizen/CitizenComplaintsPage';
+import { CitizenSuggestionsPage } from './pages/citizen/CitizenSuggestionsPage';
+import { CitizenVotingPage } from './pages/citizen/CitizenVotingPage';
+import { CitizenProjectsPage } from './pages/citizen/CitizenProjectsPage';
+import { CitizenMapPage } from './pages/citizen/CitizenMapPage';
+import { CitizenAnnouncementsPage } from './pages/citizen/CitizenAnnouncementsPage';
+import { CitizenNotificationsPage } from './pages/citizen/CitizenNotificationsPage';
+import { CitizenAIPage } from './pages/citizen/CitizenAIPage';
+
+// Authority & Contractor Placeholder Shells (Activated in Phases 7 & 8)
 import { ProjectManagerDashboardShell } from './pages/dashboards/ProjectManagerDashboardShell';
 import { ContractorDashboardShell } from './pages/dashboards/ContractorDashboardShell';
 
-// Root Redirect Component
+// Root Route Handler
 const RootRoute: React.FC = () => {
   const { isAuthenticated, role, loading } = useAuth();
 
@@ -37,7 +49,6 @@ const RootRoute: React.FC = () => {
     return <Navigate to={getDashboardRouteForRole(role)} replace />;
   }
 
-  // If not signed in, show the Design System Showcase with header and prompt to login
   return (
     <Layout>
       <DesignSystemShowcase />
@@ -50,13 +61,11 @@ export const App: React.FC = () => {
     <AuthProvider>
       <Router>
         <Routes>
-          {/* Public Auth Routes */}
+          {/* Public Auth & Foundation Routes */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/unauthorized" element={<UnauthorizedPage />} />
-
-          {/* Root & Design Showcase */}
           <Route path="/" element={<RootRoute />} />
           <Route
             path="/design-system"
@@ -67,14 +76,16 @@ export const App: React.FC = () => {
             }
           />
 
-          {/* Protected Role-Based Dashboard Routes */}
+          {/* ========================================================= */}
+          {/* PHASE 3: CITIZEN DASHBOARD & MODULE ROUTES               */}
+          {/* ========================================================= */}
           <Route
             path="/dashboard/citizen"
             element={
               <ProtectedRoute>
                 <RoleGuard allowedRoles={['citizen']}>
-                  <Layout activeTab="dashboard">
-                    <CitizenDashboardShell />
+                  <Layout>
+                    <CitizenDashboard />
                   </Layout>
                 </RoleGuard>
               </ProtectedRoute>
@@ -82,11 +93,144 @@ export const App: React.FC = () => {
           />
 
           <Route
+            path="/dashboard/citizen/profile"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['citizen']}>
+                  <Layout>
+                    <CitizenProfilePage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/citizen/settings"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['citizen']}>
+                  <Layout>
+                    <CitizenSettingsPage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/citizen/complaints"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['citizen']}>
+                  <Layout>
+                    <CitizenComplaintsPage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/citizen/suggestions"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['citizen']}>
+                  <Layout>
+                    <CitizenSuggestionsPage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/citizen/voting"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['citizen']}>
+                  <Layout>
+                    <CitizenVotingPage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/citizen/projects"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['citizen']}>
+                  <Layout>
+                    <CitizenProjectsPage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/citizen/map"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['citizen']}>
+                  <Layout>
+                    <CitizenMapPage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/citizen/announcements"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['citizen']}>
+                  <Layout>
+                    <CitizenAnnouncementsPage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/citizen/notifications"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['citizen']}>
+                  <Layout>
+                    <CitizenNotificationsPage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/citizen/ai"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['citizen']}>
+                  <Layout>
+                    <CitizenAIPage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* ========================================================= */}
+          {/* AUTHORITY & CONTRACTOR SHELLS (Pending Phases 7 & 8)      */}
+          {/* ========================================================= */}
+          <Route
             path="/dashboard/project-manager"
             element={
               <ProtectedRoute>
                 <RoleGuard allowedRoles={['project_manager']}>
-                  <Layout activeTab="authority-center">
+                  <Layout>
                     <ProjectManagerDashboardShell />
                   </Layout>
                 </RoleGuard>
@@ -99,7 +243,7 @@ export const App: React.FC = () => {
             element={
               <ProtectedRoute>
                 <RoleGuard allowedRoles={['contractor']}>
-                  <Layout activeTab="contractor-updates">
+                  <Layout>
                     <ContractorDashboardShell />
                   </Layout>
                 </RoleGuard>
