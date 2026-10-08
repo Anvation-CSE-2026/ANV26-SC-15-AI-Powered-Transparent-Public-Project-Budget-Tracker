@@ -22,6 +22,7 @@ import {
   Pin,
   ExternalLink,
   ShieldCheck,
+  MapPin,
 } from 'lucide-react';
 import { formatCurrencyINR, formatDate, formatPercentage } from '../../utils/formatters';
 import {
@@ -183,6 +184,22 @@ export const CitizenProjectDetailPage: React.FC = () => {
                 <HardHat className="w-3.5 h-3.5 text-amber-400" />
                 <span>Contractor: {project.contractorName}</span>
               </span>
+            </>
+          )}
+          {project.location?.latitude && project.location?.longitude && (
+            <>
+              <span>&bull;</span>
+              <button
+                onClick={() =>
+                  navigate(
+                    `/dashboard/citizen/map?focusLat=${project.location.latitude}&focusLng=${project.location.longitude}`
+                  )
+                }
+                className="flex items-center gap-1.5 text-sky-300 hover:text-white transition-colors cursor-pointer"
+              >
+                <MapPin className="w-3.5 h-3.5 text-sky-400" />
+                <span>View on GIS Map</span>
+              </button>
             </>
           )}
         </div>

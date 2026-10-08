@@ -7,11 +7,13 @@ import {
   ArrowLeft,
   AlertCircle,
   Lock,
+  MapPin,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { formatDate } from '../../utils/formatters';
 import { INITIAL_DEPARTMENTS } from '../../data/departmentsData';
 import { getProjectById, updateProject } from '../../api/projectService';
+import { LocationPickerModal } from '../../components/map/LocationPickerModal';
 import type { Project, ProjectCategory, ProjectStatus, UpdateProjectInput } from '../../types/project';
 
 const CATEGORIES: ProjectCategory[] = [
@@ -63,6 +65,9 @@ export const EditProjectPage: React.FC = () => {
   const [address, setAddress] = useState('');
   const [ward, setWard] = useState('Ward 12');
   const [city, setCity] = useState('Pune Metro');
+  const [latitude, setLatitude] = useState('');
+  const [longitude, setLongitude] = useState('');
+  const [showMapPicker, setShowMapPicker] = useState(false);
 
   // Finances
   const [approvedBudget, setApprovedBudget] = useState('');
@@ -96,6 +101,8 @@ export const EditProjectPage: React.FC = () => {
           setAddress(p.location.address || '');
           setWard(p.location.ward || 'Ward 12');
           setCity(p.location.city || 'Pune Metro');
+          setLatitude(p.location.latitude !== undefined ? p.location.latitude.toString() : '');
+          setLongitude(p.location.longitude !== undefined ? p.location.longitude.toString() : '');
           setApprovedBudget(p.approvedBudget.toString());
           setEstimatedCost(p.estimatedCost.toString());
           setActualSpending(p.actualSpending.toString());
@@ -171,6 +178,8 @@ export const EditProjectPage: React.FC = () => {
           address: address.trim(),
           ward,
           city,
+          latitude: latitude ? parseFloat(latitude) : undefined,
+          longitude: longitude ? parseFloat(longitude) : undefined,
         },
         approvedBudget: parseFloat(approvedBudget),
         estimatedCost: parseFloat(estimatedCost),
@@ -418,12 +427,22 @@ export const EditProjectPage: React.FC = () => {
 
         {/* Location & Contractor */}
         <Card className="border-slate-200/80">
-          <CardHeader>
+          <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <CardTitle>Location &amp; Agency</CardTitle>
+            <Button
+              variant="outline"
+              size="sm"
+              type="button"
+              onClick={() => setShowMapPicker(true)}
+              leftIcon={<MapPin className="w-3.5 h-3.5 text-blue-600" />}
+              className="text-xs text-blue-700 border-blue-300 hover:bg-blue-50 self-start sm:self-auto"
+            >
+              Pinpoint on GIS Map
+            </Button>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="sm:col-span-2">
                 <label className="block text-xs font-semibold text-slate-700 mb-1">Address</label>
                 <input
                   type="text"
@@ -444,6 +463,36 @@ export const EditProjectPage: React.FC = () => {
                     <option key={w} value={w}>{w}</option>
                   ))}
                 </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">City</label>
+                <input
+                  type="text"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Latitude</label>
+                <input
+                  type="text"
+                  value={latitude}
+                  onChange={(e) => setLatitude(e.target.value)}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Longitude</label>
+                <input
+                  type="text"
+                  value={longitude}
+                  onChange={(e) => setLongitude(e.target.value)}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white"
+                />
               </div>
             </div>
 
@@ -524,6 +573,21 @@ export const EditProjectPage: React.FC = () => {
           </Button>
         </div>
       </form>
+
+      {/* Interactive GIS Location Picker */}
+      <LocationPickerModal
+        isOpen={showMapPicker}
+        onClose={() => setShowMapPicker(false)}
+        initialLatitude={latitude ? parseFloat(latitude) : undefined}
+        initialLongitude={longitude ? parseFloat(longitude) : undefined}
+        initialAddress={address}
+        title="Pinpoint Worksite GIS Coordinates"
+        description="Select the exact location of the public worksite on the municipal map."
+        onConfirm={(coords) => {
+          setLatitude(coords.latitude.toString());
+          setLongitude(coords.longitude.toString());
+        }}
+      />
     </div>
   );
 };

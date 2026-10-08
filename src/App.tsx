@@ -50,6 +50,7 @@ import { AuthorityProjectDetailPage } from './pages/authority/AuthorityProjectDe
 import { EditProjectPage } from './pages/authority/EditProjectPage';
 import { AuthoritySubmissionsQueuePage } from './pages/authority/AuthoritySubmissionsQueuePage';
 import { AuthoritySubmissionDetailPage } from './pages/authority/AuthoritySubmissionDetailPage';
+import { AuthorityMapPage } from './pages/authority/AuthorityMapPage';
 import { ContractorDashboardShell } from './pages/dashboards/ContractorDashboardShell';
 import { ContractorProjectsPage } from './pages/contractor/ContractorProjectsPage';
 import { ContractorProjectDetailPage } from './pages/contractor/ContractorProjectDetailPage';
@@ -506,6 +507,20 @@ export const App: React.FC = () => {
                 <RoleGuard allowedRoles={['project_manager']}>
                   <Layout>
                     <AuthoritySubmissionDetailPage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* PHASE 9: AUTHORITY GIS LOCATION INTELLIGENCE MAP */}
+          <Route
+            path="/dashboard/project-manager/map"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['project_manager']}>
+                  <Layout>
+                    <AuthorityMapPage />
                   </Layout>
                 </RoleGuard>
               </ProtectedRoute>

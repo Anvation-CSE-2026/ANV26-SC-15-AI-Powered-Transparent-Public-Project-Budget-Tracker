@@ -21,6 +21,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { createComplaint } from '../../api/complaintService';
+import { LocationPickerModal } from '../../components/map/LocationPickerModal';
 import type {
   ComplaintCategory,
   ComplaintPriority,
@@ -76,6 +77,7 @@ export const CreateComplaintPage: React.FC = () => {
   const [longitude, setLongitude] = useState<number | undefined>();
   const [detectingGps, setDetectingGps] = useState(false);
   const [gpsError, setGpsError] = useState<string | null>(null);
+  const [showMapPicker, setShowMapPicker] = useState(false);
 
   // Attachments State
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -393,16 +395,28 @@ export const CreateComplaintPage: React.FC = () => {
                     Helps municipal engineers locate the exact pothole or outage on city maps.
                   </p>
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  type="button"
-                  isLoading={detectingGps}
-                  onClick={handleDetectLocation}
-                  className="bg-white text-blue-700 border-blue-300 hover:bg-blue-100"
-                >
-                  Detect Current Location
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    type="button"
+                    onClick={() => setShowMapPicker(true)}
+                    leftIcon={<MapPin className="w-3.5 h-3.5 text-blue-600" />}
+                    className="bg-white text-blue-700 border-blue-300 hover:bg-blue-100"
+                  >
+                    Pick on Map
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    type="button"
+                    isLoading={detectingGps}
+                    onClick={handleDetectLocation}
+                    className="bg-white text-blue-700 border-blue-300 hover:bg-blue-100"
+                  >
+                    Detect Current Location
+                  </Button>
+                </div>
               </div>
 
               {gpsError && (
@@ -694,6 +708,21 @@ export const CreateComplaintPage: React.FC = () => {
           </div>
         </Modal>
       )}
+
+      {/* Interactive Location Picker Modal */}
+      <LocationPickerModal
+        isOpen={showMapPicker}
+        onClose={() => setShowMapPicker(false)}
+        initialLatitude={latitude}
+        initialLongitude={longitude}
+        initialAddress={address}
+        title="Pinpoint Grievance Location"
+        description="Drop a pin on the exact location of the civic issue on the map."
+        onConfirm={(coords) => {
+          setLatitude(coords.latitude);
+          setLongitude(coords.longitude);
+        }}
+      />
     </div>
   );
 };

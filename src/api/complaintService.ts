@@ -28,18 +28,227 @@ import { calculateSLAStatus } from '../utils/slaCalculator';
 const LOCAL_STORAGE_COMPLAINTS = 'civicsight_local_complaints';
 const LOCAL_STORAGE_UPDATES = 'civicsight_local_complaint_updates';
 
+function getInitialSeedComplaints(): Record<string, Complaint> {
+  const c1: Complaint = {
+    id: 'cmp-seed-1',
+    complaintNumber: 'CMP-2026-00401',
+    citizenId: 'cit-seed-1',
+    citizenName: 'Aarav Sharma',
+    citizenEmail: 'aarav@citizen.org',
+    title: 'Major Water Main Burst Flooding Intersection',
+    description: 'Underground high-pressure municipal water pipe fractured, leaking hundreds of liters per minute onto the road and threatening local shops.',
+    category: 'Water',
+    priority: 'emergency',
+    severity: 'critical',
+    status: 'in_progress',
+    location: {
+      address: 'Junction of FC Road and Modern College lane',
+      ward: 'Ward 12',
+      city: 'Pune Metro',
+      latitude: 18.5285,
+      longitude: 73.8425,
+    },
+    departmentId: 'dept_water',
+    departmentName: 'Water Supply & Sewerage',
+    assignedOfficerName: 'Er. Rajesh Deshmukh',
+    sla: {
+      deadline: '2026-10-10T18:00:00.000Z',
+      status: 'approaching',
+      hoursRemaining: 18,
+    },
+    attachments: [],
+    createdAt: '2026-10-08T08:30:00.000Z',
+    updatedAt: '2026-10-08T10:00:00.000Z',
+  };
+
+  const c2: Complaint = {
+    id: 'cmp-seed-2',
+    complaintNumber: 'CMP-2026-00402',
+    citizenId: 'cit-seed-2',
+    citizenName: 'Sneha Patil',
+    citizenEmail: 'sneha@citizen.org',
+    title: 'Hazardous Uncovered Trench & Open Manhole',
+    description: 'Deep road excavation without warning barricades or safety cones right next to school pedestrian crossing.',
+    category: 'Roads',
+    priority: 'emergency',
+    severity: 'critical',
+    status: 'assigned',
+    location: {
+      address: 'Opposite Central High School, Paud Road',
+      ward: 'Ward 4',
+      city: 'Pune Metro',
+      latitude: 18.5085,
+      longitude: 73.8120,
+    },
+    departmentId: 'dept_roads',
+    departmentName: 'Roads & Infrastructure',
+    assignedOfficerName: 'Er. Pooja Kulkarni',
+    sla: {
+      deadline: '2026-10-11T12:00:00.000Z',
+      status: 'on_track',
+      hoursRemaining: 36,
+    },
+    attachments: [],
+    createdAt: '2026-10-07T14:15:00.000Z',
+    updatedAt: '2026-10-08T09:00:00.000Z',
+  };
+
+  const c3: Complaint = {
+    id: 'cmp-seed-3',
+    complaintNumber: 'CMP-2026-00403',
+    citizenId: 'cit-seed-3',
+    citizenName: 'Rohan Joshi',
+    citizenEmail: 'rohan@citizen.org',
+    title: 'Severe Stormwater Drain Blockage & Monsoon Stagnation',
+    description: 'Storm drain inlet choked with plastic waste and construction debris causing street-level sewage backflow.',
+    category: 'Drainage',
+    priority: 'high',
+    severity: 'high',
+    status: 'under_review',
+    location: {
+      address: 'Subhash Nagar Canal Cross Road',
+      ward: 'Ward 8',
+      city: 'Pune Metro',
+      latitude: 18.5320,
+      longitude: 73.8460,
+    },
+    departmentId: 'dept_drainage',
+    departmentName: 'Stormwater & Drainage',
+    sla: {
+      deadline: '2026-10-06T10:00:00.000Z',
+      status: 'breached',
+      hoursRemaining: -48,
+    },
+    attachments: [],
+    createdAt: '2026-10-04T11:00:00.000Z',
+    updatedAt: '2026-10-05T14:00:00.000Z',
+  };
+
+  const c4: Complaint = {
+    id: 'cmp-seed-4',
+    complaintNumber: 'CMP-2026-00404',
+    citizenId: 'cit-seed-1',
+    citizenName: 'Aarav Sharma',
+    citizenEmail: 'aarav@citizen.org',
+    title: 'Commercial Waste Dumpster Overflowing on Footpath',
+    description: 'Solid municipal waste bins have not been cleared in 4 days, causing foul smell and health hazard.',
+    category: 'Garbage',
+    priority: 'medium',
+    severity: 'moderate',
+    status: 'submitted',
+    location: {
+      address: 'Sector 3 Market Gate, Viman Nagar',
+      ward: 'Ward 7',
+      city: 'Pune Metro',
+      latitude: 18.5665,
+      longitude: 73.9120,
+    },
+    attachments: [],
+    createdAt: '2026-10-08T16:20:00.000Z',
+    updatedAt: '2026-10-08T16:20:00.000Z',
+  };
+
+  const c5: Complaint = {
+    id: 'cmp-seed-5',
+    complaintNumber: 'CMP-2026-00405',
+    citizenId: 'cit-seed-4',
+    citizenName: 'Vikram Mehta',
+    citizenEmail: 'vikram@citizen.org',
+    title: 'Avenue Street Lights Complete Outage',
+    description: 'Dark corridor of 12 consecutive streetlights along Hadapsar link road creating safety concerns for night commuters.',
+    category: 'Street Lights',
+    priority: 'medium',
+    severity: 'moderate',
+    status: 'in_progress',
+    location: {
+      address: 'Hadapsar Bypass Link Road, Sector 15',
+      ward: 'Ward 15',
+      city: 'Pune Metro',
+      latitude: 18.5110,
+      longitude: 73.9245,
+    },
+    departmentId: 'dept_electrical',
+    departmentName: 'Electrical & Street Lighting',
+    assignedOfficerName: 'Er. Ramesh Sawant',
+    sla: {
+      deadline: '2026-10-12T18:00:00.000Z',
+      status: 'on_track',
+      hoursRemaining: 65,
+    },
+    attachments: [],
+    createdAt: '2026-10-06T19:00:00.000Z',
+    updatedAt: '2026-10-07T11:30:00.000Z',
+  };
+
+  const c6: Complaint = {
+    id: 'cmp-seed-6',
+    complaintNumber: 'CMP-2026-00406',
+    citizenId: 'cit-seed-5',
+    citizenName: 'Kavita Rao',
+    citizenEmail: 'kavita@citizen.org',
+    title: 'Damaged Asphalt Pothole Repaired & Sealed',
+    description: 'Deep road depression filled with cold asphalt mix, leveled, and compacted. Work verified by municipal supervisor.',
+    category: 'Roads',
+    priority: 'low',
+    severity: 'low',
+    status: 'resolved',
+    location: {
+      address: 'University Road North Corridor',
+      ward: 'Ward 12',
+      city: 'Pune Metro',
+      latitude: 18.5360,
+      longitude: 73.8310,
+    },
+    departmentId: 'dept_roads',
+    departmentName: 'Roads & Infrastructure',
+    assignedOfficerName: 'Er. Pooja Kulkarni',
+    resolution: {
+      summary: 'Pothole asphalt patch repaired and inspected on site.',
+      resolvedBy: 'Er. Pooja Kulkarni',
+      resolvedAt: '2026-10-07T15:00:00.000Z',
+      proofAttachments: [],
+    },
+    attachments: [],
+    createdAt: '2026-10-02T10:00:00.000Z',
+    updatedAt: '2026-10-07T15:00:00.000Z',
+  };
+
+  return {
+    [c1.id]: c1,
+    [c2.id]: c2,
+    [c3.id]: c3,
+    [c4.id]: c4,
+    [c5.id]: c5,
+    [c6.id]: c6,
+  };
+}
+
+let complaintMemoryStore: Record<string, Complaint> | null = null;
+
 function getLocalComplaints(): Record<string, Complaint> {
   try {
-    const raw = sessionStorage.getItem(LOCAL_STORAGE_COMPLAINTS);
-    return raw ? JSON.parse(raw) : {};
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      const raw = window.sessionStorage.getItem(LOCAL_STORAGE_COMPLAINTS);
+      if (raw) return JSON.parse(raw);
+      const seeds = getInitialSeedComplaints();
+      window.sessionStorage.setItem(LOCAL_STORAGE_COMPLAINTS, JSON.stringify(seeds));
+      return seeds;
+    }
   } catch {
-    return {};
+    // fallback
   }
+  if (!complaintMemoryStore) {
+    complaintMemoryStore = getInitialSeedComplaints();
+  }
+  return complaintMemoryStore;
 }
 
 function saveLocalComplaints(data: Record<string, Complaint>) {
+  complaintMemoryStore = data;
   try {
-    sessionStorage.setItem(LOCAL_STORAGE_COMPLAINTS, JSON.stringify(data));
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      window.sessionStorage.setItem(LOCAL_STORAGE_COMPLAINTS, JSON.stringify(data));
+    }
   } catch {
     // ignore
   }

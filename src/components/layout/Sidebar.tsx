@@ -61,6 +61,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'suggestions-queue', label: 'Suggestions Queue', path: '/dashboard/project-manager/suggestions', icon: <Lightbulb className="w-4 h-4" /> },
     { id: 'voting-management', label: 'Civic Polls & Voting', path: '/dashboard/project-manager/voting', icon: <Vote className="w-4 h-4" /> },
     { id: 'contractor-submissions', label: 'Contractor Submissions', path: '/dashboard/project-manager/submissions', icon: <HardHat className="w-4 h-4" />, badge: 'Queue' },
+    { id: 'gis-map', label: 'GIS Location Map', path: '/dashboard/project-manager/map', icon: <MapPin className="w-4 h-4" />, badge: 'GIS' },
     { id: 'risk-engine', label: 'Risk Engine', path: '/design-system', icon: <ShieldAlert className="w-4 h-4" />, badge: 'Anomaly' },
     { id: 'audit-logs', label: 'Audit Trail', path: '/design-system', icon: <History className="w-4 h-4" /> },
   ];

@@ -26,6 +26,7 @@ import {
   ShieldCheck,
   ArrowRight,
 } from 'lucide-react';
+import { WorksiteMapPreview } from '../../components/map/WorksiteMapPreview';
 
 export const ContractorProjectDetailPage: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
@@ -310,6 +311,22 @@ export const ContractorProjectDetailPage: React.FC = () => {
                 <span className="text-slate-500">Address</span>
                 <span className="font-semibold text-slate-800">{project.location.address}</span>
               </div>
+
+              {project.location && (
+                <div className="pt-2">
+                  <WorksiteMapPreview
+                    latitude={project.location.latitude}
+                    longitude={project.location.longitude}
+                    title={project.name}
+                    address={project.location.address}
+                    ward={project.location.ward}
+                    city={project.location.city}
+                    type="project"
+                    status={project.status}
+                    heightClass="h-44"
+                  />
+                </div>
+              )}
             </CardContent>
           </Card>
 

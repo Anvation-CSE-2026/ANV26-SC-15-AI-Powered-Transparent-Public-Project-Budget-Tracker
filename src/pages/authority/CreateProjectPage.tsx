@@ -8,10 +8,12 @@ import {
   Plus,
   Trash2,
   AlertCircle,
+  MapPin,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { INITIAL_DEPARTMENTS } from '../../data/departmentsData';
 import { createProject } from '../../api/projectService';
+import { LocationPickerModal } from '../../components/map/LocationPickerModal';
 import type { ProjectCategory, CreateProjectInput } from '../../types/project';
 
 const CATEGORIES: ProjectCategory[] = [
@@ -66,6 +68,7 @@ export const CreateProjectPage: React.FC = () => {
   const [city, setCity] = useState('Pune Metro');
   const [latitude, setLatitude] = useState('18.5204');
   const [longitude, setLongitude] = useState('73.8567');
+  const [showMapPicker, setShowMapPicker] = useState(false);
 
   // Finances
   const [approvedBudget, setApprovedBudget] = useState('10.0');
@@ -343,11 +346,21 @@ export const CreateProjectPage: React.FC = () => {
 
         {/* Section 2: Location & Ward */}
         <Card className="border-slate-200/80">
-          <CardHeader>
+          <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
               <CardTitle>2. Worksite Location &amp; Ward</CardTitle>
               <CardDescription>Geographic jurisdiction and physical street coordinates</CardDescription>
             </div>
+            <Button
+              variant="outline"
+              size="sm"
+              type="button"
+              onClick={() => setShowMapPicker(true)}
+              leftIcon={<MapPin className="w-3.5 h-3.5 text-blue-600" />}
+              className="text-xs text-blue-700 border-blue-300 hover:bg-blue-50 self-start sm:self-auto"
+            >
+              Pinpoint on GIS Map
+            </Button>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
@@ -697,6 +710,21 @@ export const CreateProjectPage: React.FC = () => {
           </Button>
         </div>
       </form>
+
+      {/* Interactive GIS Location Picker */}
+      <LocationPickerModal
+        isOpen={showMapPicker}
+        onClose={() => setShowMapPicker(false)}
+        initialLatitude={latitude ? parseFloat(latitude) : undefined}
+        initialLongitude={longitude ? parseFloat(longitude) : undefined}
+        initialAddress={address}
+        title="Pinpoint Worksite GIS Coordinates"
+        description="Select the exact location of the public worksite on the municipal map."
+        onConfirm={(coords) => {
+          setLatitude(coords.latitude.toString());
+          setLongitude(coords.longitude.toString());
+        }}
+      />
     </div>
   );
 };

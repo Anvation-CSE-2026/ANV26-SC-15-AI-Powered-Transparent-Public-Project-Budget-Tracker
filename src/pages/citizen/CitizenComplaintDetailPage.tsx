@@ -25,6 +25,7 @@ import {
 import { getComplaintById, getComplaintUpdates, submitComplaintFeedback } from '../../api/complaintService';
 import type { Complaint, ComplaintUpdate, ComplaintStatus, ComplaintPriority } from '../../types/complaint';
 import { formatDate } from '../../utils/formatters';
+import { WorksiteMapPreview } from '../../components/map/WorksiteMapPreview';
 
 export const CitizenComplaintDetailPage: React.FC = () => {
   const { complaintId } = useParams<{ complaintId: string }>();
@@ -297,6 +298,27 @@ export const CitizenComplaintDetailPage: React.FC = () => {
                   </p>
                 </div>
               </div>
+
+              {/* Worksite GIS Map Location */}
+              {complaint.location.latitude && complaint.location.longitude && (
+                <div className="pt-2">
+                  <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                    Verified Geo-Coordinates
+                  </h4>
+                  <WorksiteMapPreview
+                    latitude={complaint.location.latitude}
+                    longitude={complaint.location.longitude}
+                    title={complaint.title}
+                    address={complaint.location.address}
+                    ward={complaint.location.ward}
+                    city={complaint.location.city}
+                    type="complaint"
+                    priority={complaint.priority}
+                    status={complaint.status}
+                    heightClass="h-44"
+                  />
+                </div>
+              )}
 
               {/* Citizen Original Evidence Gallery */}
               {complaint.attachments && complaint.attachments.length > 0 && (

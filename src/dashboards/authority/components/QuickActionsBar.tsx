@@ -8,6 +8,7 @@ import {
   Vote,
   Building2,
   ExternalLink,
+  MapPin,
 } from 'lucide-react';
 
 export const QuickActionsBar: React.FC = () => {
@@ -59,6 +60,16 @@ export const QuickActionsBar: React.FC = () => {
           onClick={() => navigate('/dashboard/project-manager/voting/new')}
         >
           Create Poll
+        </Button>
+
+        <Button
+          variant="outline"
+          size="sm"
+          className="text-xs text-slate-700 border-slate-200 hover:bg-slate-50"
+          leftIcon={<MapPin className="w-3.5 h-3.5 text-blue-600" />}
+          onClick={() => navigate('/dashboard/project-manager/map')}
+        >
+          GIS Map
         </Button>
 
         <Button
