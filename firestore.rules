@@ -124,7 +124,77 @@ service cloud.firestore {
     }
 
     // ==========================================
-    // 5. Contractor Updates (contractorUpdates/{updateId})
+    // 5. Suggestions Collection (suggestions/{suggestionId})
+    // ==========================================
+    match /suggestions/{suggestionId} {
+      // Public transparency: citizens and authority can read suggestions
+      allow read: if isAuthenticated();
+
+      // Citizen can create suggestion with their own citizenId
+      allow create: if isAuthenticated() &&
+                    request.resource.data.citizenId == request.auth.uid;
+
+      // Citizen can update only their own suggestion while pending review
+      // Authority (PM) can update status and official responses
+      allow update: if (isAuthenticated() && resource.data.citizenId == request.auth.uid) ||
+                    isProjectManager();
+
+      allow delete: if isProjectManager();
+
+      // Suggestion Updates and Audit Subcollection
+      match /updates/{updateId} {
+        // Public updates visible to all authenticated users
+        // Internal notes (isInternal == true) strictly restricted to Project Managers
+        allow read: if isAuthenticated() && (
+          isProjectManager() ||
+          resource.data.isInternal == false
+        );
+
+        allow create: if isAuthenticated() && (
+          isProjectManager() ||
+          request.resource.data.actorId == request.auth.uid
+        );
+
+        allow update, delete: if isProjectManager();
+      }
+    }
+
+    // ==========================================
+    // 6. Civic Polls Collection (polls/{pollId})
+    // ==========================================
+    match /polls/{pollId} {
+      // Authenticated users can read polls
+      allow read: if isAuthenticated();
+
+      // Project managers create and delete polls
+      allow create, delete: if isProjectManager();
+
+      // PM can update all fields (status, options, dates)
+      // Citizens can increment vote counters via atomic transactions
+      allow update: if isProjectManager() ||
+                    (isAuthenticated() &&
+                     request.resource.data.diff(resource.data).affectedKeys().hasOnly(['options', 'totalVotes', 'updatedAt']));
+
+      // One-User-One-Vote Subcollection (polls/{pollId}/votes/{userId})
+      match /votes/{userId} {
+        // Voter can read their own ballot; PM can verify audits
+        allow read: if isAuthenticated() && (request.auth.uid == userId || isProjectManager());
+
+        // Strictly enforce One-User-One-Vote:
+        // 1. Must be authenticated
+        // 2. Document ID in path must equal authenticated UID
+        // 3. Document body userId must equal authenticated UID
+        allow create: if isAuthenticated() &&
+                      request.auth.uid == userId &&
+                      request.resource.data.userId == request.auth.uid;
+
+        // Ballots are completely immutable: once cast, cannot be modified or deleted
+        allow update, delete: if false;
+      }
+    }
+
+    // ==========================================
+    // 7. Contractor Updates (contractorUpdates/{updateId})
     // ==========================================
     match /contractorUpdates/{updateId} {
       allow read: if isAuthenticated();

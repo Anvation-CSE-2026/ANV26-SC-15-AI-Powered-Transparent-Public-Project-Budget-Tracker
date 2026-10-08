@@ -24,7 +24,10 @@ import { CitizenComplaintsPage } from './pages/citizen/CitizenComplaintsPage';
 import { CreateComplaintPage } from './pages/citizen/CreateComplaintPage';
 import { CitizenComplaintDetailPage } from './pages/citizen/CitizenComplaintDetailPage';
 import { CitizenSuggestionsPage } from './pages/citizen/CitizenSuggestionsPage';
+import { CreateSuggestionPage } from './pages/citizen/CreateSuggestionPage';
+import { CitizenSuggestionDetailPage } from './pages/citizen/CitizenSuggestionDetailPage';
 import { CitizenVotingPage } from './pages/citizen/CitizenVotingPage';
+import { CitizenPollDetailPage } from './pages/citizen/CitizenPollDetailPage';
 import { CitizenProjectsPage } from './pages/citizen/CitizenProjectsPage';
 import { CitizenMapPage } from './pages/citizen/CitizenMapPage';
 import { CitizenAnnouncementsPage } from './pages/citizen/CitizenAnnouncementsPage';
@@ -35,6 +38,11 @@ import { CitizenAIPage } from './pages/citizen/CitizenAIPage';
 import { ProjectManagerDashboardShell } from './pages/dashboards/ProjectManagerDashboardShell';
 import { AuthorityComplaintsQueuePage } from './pages/authority/AuthorityComplaintsQueuePage';
 import { AuthorityComplaintDetailPage } from './pages/authority/AuthorityComplaintDetailPage';
+import { AuthoritySuggestionsQueuePage } from './pages/authority/AuthoritySuggestionsQueuePage';
+import { AuthoritySuggestionDetailPage } from './pages/authority/AuthoritySuggestionDetailPage';
+import { AuthorityPollsManagementPage } from './pages/authority/AuthorityPollsManagementPage';
+import { CreatePollPage } from './pages/authority/CreatePollPage';
+import { AuthorityPollDetailPage } from './pages/authority/AuthorityPollDetailPage';
 import { ContractorDashboardShell } from './pages/dashboards/ContractorDashboardShell';
 
 // Root Route Handler
@@ -175,12 +183,51 @@ export const App: React.FC = () => {
           />
 
           <Route
+            path="/dashboard/citizen/suggestions/new"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['citizen']}>
+                  <Layout>
+                    <CreateSuggestionPage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/citizen/suggestions/:suggestionId"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['citizen']}>
+                  <Layout>
+                    <CitizenSuggestionDetailPage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
             path="/dashboard/citizen/voting"
             element={
               <ProtectedRoute>
                 <RoleGuard allowedRoles={['citizen']}>
                   <Layout>
                     <CitizenVotingPage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/citizen/voting/:pollId"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['citizen']}>
+                  <Layout>
+                    <CitizenPollDetailPage />
                   </Layout>
                 </RoleGuard>
               </ProtectedRoute>
@@ -288,6 +335,72 @@ export const App: React.FC = () => {
                 <RoleGuard allowedRoles={['project_manager']}>
                   <Layout>
                     <AuthorityComplaintDetailPage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* PHASE 5: AUTHORITY SUGGESTIONS & VOTING ROUTES */}
+          <Route
+            path="/dashboard/project-manager/suggestions"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['project_manager']}>
+                  <Layout>
+                    <AuthoritySuggestionsQueuePage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/project-manager/suggestions/:suggestionId"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['project_manager']}>
+                  <Layout>
+                    <AuthoritySuggestionDetailPage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/project-manager/voting"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['project_manager']}>
+                  <Layout>
+                    <AuthorityPollsManagementPage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/project-manager/voting/new"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['project_manager']}>
+                  <Layout>
+                    <CreatePollPage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/project-manager/voting/:pollId"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['project_manager']}>
+                  <Layout>
+                    <AuthorityPollDetailPage />
                   </Layout>
                 </RoleGuard>
               </ProtectedRoute>

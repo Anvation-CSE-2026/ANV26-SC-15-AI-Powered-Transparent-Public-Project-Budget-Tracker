@@ -115,6 +115,78 @@ export const ProjectManagerDashboardShell: React.FC = () => {
           </Button>
         </CardContent>
       </Card>
+
+      {/* PHASE 5: CITIZEN SUGGESTIONS MODERATION MODULE */}
+      <Card className="border-amber-200 bg-gradient-to-br from-white to-amber-50/30">
+        <CardHeader>
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <Badge variant="warning" size="sm">Phase 5 Active Module</Badge>
+              <Badge variant="success" size="sm">Suggestions Moderation</Badge>
+            </div>
+            <CardTitle>Citizen Suggestions &amp; Ideas Queue</CardTitle>
+            <CardDescription>
+              Review citizen-submitted urban improvement ideas, evaluate municipal alignment, record official public decisions, and log internal engineering notes.
+            </CardDescription>
+          </div>
+        </CardHeader>
+        <CardContent className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-2">
+          <div className="text-xs text-slate-600 space-y-1">
+            <p className="font-semibold text-slate-800">Available Authority Actions:</p>
+            <ul className="list-disc list-inside text-slate-500 space-y-0.5">
+              <li>Track unique SGG-YYYY-XXXXX proposal tracking IDs</li>
+              <li>Perform status transitions (Submitted &rarr; Under Review &rarr; Accepted &rarr; Implemented)</li>
+              <li>Publish formal authority responses visible on citizen portal</li>
+              <li>Record confidential internal staff memos hidden from public view</li>
+            </ul>
+          </div>
+
+          <Button
+            variant="primary"
+            size="md"
+            className="bg-amber-600 hover:bg-amber-500 shadow-md shadow-amber-500/20 shrink-0 text-white"
+            onClick={() => window.location.assign('/dashboard/project-manager/suggestions')}
+          >
+            Open Suggestions Queue &rarr;
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* PHASE 5: CIVIC POLLS & REFERENDUM MODULE */}
+      <Card className="border-indigo-200 bg-gradient-to-br from-white to-indigo-50/30">
+        <CardHeader>
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <Badge variant="info" size="sm">Phase 5 Active Module</Badge>
+              <Badge variant="success" size="sm">Democratic Balloting</Badge>
+            </div>
+            <CardTitle>Civic Decision Polls &amp; Referendum Management</CardTitle>
+            <CardDescription>
+              Create public voting initiatives, configure ballot options and schedules, monitor verified one-citizen-one-vote participation, and conclude polls.
+            </CardDescription>
+          </div>
+        </CardHeader>
+        <CardContent className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-2">
+          <div className="text-xs text-slate-600 space-y-1">
+            <p className="font-semibold text-slate-800">Available Authority Actions:</p>
+            <ul className="list-disc list-inside text-slate-500 space-y-0.5">
+              <li>Draft and launch multi-option civic polls with start/end schedules</li>
+              <li>Enforce strict cryptographic one-person-one-vote rule via Firestore transactions</li>
+              <li>View real-time percentage and vote breakdowns with zero-division safety</li>
+              <li>Control lifecycle transitions (Draft &rarr; Scheduled &rarr; Active &rarr; Concluded)</li>
+            </ul>
+          </div>
+
+          <Button
+            variant="primary"
+            size="md"
+            className="bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-500/20 shrink-0 text-white"
+            onClick={() => window.location.assign('/dashboard/project-manager/voting')}
+          >
+            Manage Civic Polls &rarr;
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import React from 'react';
 
-export type BadgeVariant = 'success' | 'warning' | 'danger' | 'info' | 'neutral' | 'emergency';
+export type BadgeVariant = 'success' | 'warning' | 'danger' | 'info' | 'neutral' | 'emergency' | 'primary' | 'outline';
 export type BadgeSize = 'sm' | 'md';
 
 export interface BadgeProps {
@@ -32,6 +32,8 @@ export const Badge: React.FC<BadgeProps> = ({
     emergency: 'bg-red-100 text-red-800 border border-red-300 font-semibold animate-pulse',
     info: 'bg-sky-50 text-sky-700 border border-sky-200',
     neutral: 'bg-slate-100 text-slate-700 border border-slate-200',
+    primary: 'bg-blue-50 text-blue-700 border border-blue-200',
+    outline: 'bg-transparent text-slate-700 border border-slate-300 dark:border-slate-700 dark:text-slate-300',
   };
 
   const dotColor: Record<BadgeVariant, string> = {
@@ -41,6 +43,8 @@ export const Badge: React.FC<BadgeProps> = ({
     emergency: 'bg-red-600',
     info: 'bg-sky-500',
     neutral: 'bg-slate-400',
+    primary: 'bg-blue-500',
+    outline: 'bg-slate-400',
   };
 
   return (
