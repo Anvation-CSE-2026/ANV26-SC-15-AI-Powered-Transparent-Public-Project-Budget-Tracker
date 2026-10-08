@@ -60,9 +60,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'complaints-queue', label: 'Complaints Queue', path: '/dashboard/project-manager/complaints', icon: <AlertCircle className="w-4 h-4" />, badge: 'SLA' },
     { id: 'suggestions-queue', label: 'Suggestions Queue', path: '/dashboard/project-manager/suggestions', icon: <Lightbulb className="w-4 h-4" /> },
     { id: 'voting-management', label: 'Civic Polls & Voting', path: '/dashboard/project-manager/voting', icon: <Vote className="w-4 h-4" /> },
-    { id: 'contractor-updates', label: 'Contractor Workflows', path: '/dashboard/contractor', icon: <HardHat className="w-4 h-4" /> },
+    { id: 'contractor-submissions', label: 'Contractor Submissions', path: '/dashboard/project-manager/submissions', icon: <HardHat className="w-4 h-4" />, badge: 'Queue' },
     { id: 'risk-engine', label: 'Risk Engine', path: '/design-system', icon: <ShieldAlert className="w-4 h-4" />, badge: 'Anomaly' },
     { id: 'audit-logs', label: 'Audit Trail', path: '/design-system', icon: <History className="w-4 h-4" /> },
+  ];
+
+  const contractorItems: NavItem[] = [
+    { id: 'contractor-dashboard', label: 'Contractor Portal', path: '/dashboard/contractor', icon: <LayoutDashboard className="w-4 h-4" /> },
+    { id: 'assigned-projects', label: 'Assigned Projects', path: '/dashboard/contractor/projects', icon: <FolderGit2 className="w-4 h-4" />, badge: 'Charter' },
+    { id: 'contractor-submissions', label: 'Work Submissions', path: '/dashboard/contractor/submissions', icon: <HardHat className="w-4 h-4" />, badge: 'Audit' },
   ];
 
   const handleNavigate = (path: string) => {
@@ -90,49 +96,94 @@ export const Sidebar: React.FC<SidebarProps> = ({
         }`}
       >
         <div className="flex-1 overflow-y-auto px-4 py-5 space-y-6">
-          {/* Main Citizen Section */}
-          <div>
-            <p className="px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">
-              Citizen Transparency
-            </p>
-            <nav className="space-y-1">
-              {citizenItems.map((item) => {
-                const isActive = location.pathname === item.path;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => handleNavigate(item.path)}
-                    className={`group flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold transition-all duration-150 cursor-pointer ${
-                      isActive
-                        ? 'bg-blue-600 text-white shadow-xs shadow-blue-500/20'
-                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <span className={isActive ? 'text-white' : 'text-slate-500 group-hover:text-slate-700'}>
-                        {item.icon}
-                      </span>
-                      <span>{item.label}</span>
-                    </div>
-                    {item.badge && (
-                      <span
-                        className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
-                          isActive
-                            ? 'bg-blue-700 text-white'
-                            : 'bg-slate-100 text-slate-600 group-hover:bg-slate-200'
-                        }`}
-                      >
-                        {item.badge}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </nav>
-          </div>
+          {/* 1. If Contractor: Show only Contractor Operations */}
+          {role === 'contractor' && (
+            <div>
+              <p className="px-3 text-[11px] font-bold uppercase tracking-wider text-amber-500 mb-2">
+                Contractor Operations
+              </p>
+              <nav className="space-y-1">
+                {contractorItems.map((item) => {
+                  const isActive = location.pathname === item.path;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => handleNavigate(item.path)}
+                      className={`group flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold transition-all duration-150 cursor-pointer ${
+                        isActive
+                          ? 'bg-amber-600 text-white shadow-xs shadow-amber-500/20'
+                          : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <span className={isActive ? 'text-white' : 'text-slate-500 group-hover:text-slate-700'}>
+                          {item.icon}
+                        </span>
+                        <span>{item.label}</span>
+                      </div>
+                      {item.badge && (
+                        <span
+                          className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                            isActive
+                              ? 'bg-amber-700 text-white'
+                              : 'bg-amber-100 text-amber-800'
+                          }`}
+                        >
+                          {item.badge}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </nav>
+            </div>
+          )}
 
-          {/* Authority / Management Section (visible for authorities or platform showcase) */}
-          {role !== 'citizen' && (
+          {/* 2. Main Citizen Section (Visible to Citizens and Project Managers) */}
+          {role !== 'contractor' && (
+            <div>
+              <p className="px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">
+                Citizen Transparency
+              </p>
+              <nav className="space-y-1">
+                {citizenItems.map((item) => {
+                  const isActive = location.pathname === item.path;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => handleNavigate(item.path)}
+                      className={`group flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold transition-all duration-150 cursor-pointer ${
+                        isActive
+                          ? 'bg-blue-600 text-white shadow-xs shadow-blue-500/20'
+                          : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <span className={isActive ? 'text-white' : 'text-slate-500 group-hover:text-slate-700'}>
+                          {item.icon}
+                        </span>
+                        <span>{item.label}</span>
+                      </div>
+                      {item.badge && (
+                        <span
+                          className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                            isActive
+                              ? 'bg-blue-700 text-white'
+                              : 'bg-slate-100 text-slate-600 group-hover:bg-slate-200'
+                          }`}
+                        >
+                          {item.badge}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </nav>
+            </div>
+          )}
+
+          {/* 3. Authority / Management Section (visible for project managers) */}
+          {role === 'project_manager' && (
             <div>
               <p className="px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">
                 Authority &amp; Management
@@ -178,24 +229,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Footer Navigation (Profile & Settings) */}
         <div className="p-3 border-t border-slate-100 bg-slate-50/50 space-y-1">
           <button
-            onClick={() => handleNavigate('/dashboard/citizen/profile')}
+            onClick={() => handleNavigate(role === 'contractor' ? '/dashboard/contractor/profile' : '/dashboard/citizen/profile')}
             className={`flex items-center justify-between w-full px-3 py-2 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
-              location.pathname === '/dashboard/citizen/profile'
+              location.pathname === (role === 'contractor' ? '/dashboard/contractor/profile' : '/dashboard/citizen/profile')
                 ? 'bg-blue-600 text-white'
                 : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
             <div className="flex items-center gap-2">
-              <User className="w-4 h-4" />
-              <span>Citizen Profile</span>
+              {role === 'contractor' ? <HardHat className="w-4 h-4 text-amber-500" /> : <User className="w-4 h-4" />}
+              <span>{role === 'contractor' ? 'Contractor Profile' : 'Citizen Profile'}</span>
             </div>
             <ChevronRight className="w-3.5 h-3.5" />
           </button>
 
           <button
-            onClick={() => handleNavigate('/dashboard/citizen/settings')}
+            onClick={() => handleNavigate(role === 'contractor' ? '/dashboard/contractor/settings' : '/dashboard/citizen/settings')}
             className={`flex items-center justify-between w-full px-3 py-2 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
-              location.pathname === '/dashboard/citizen/settings'
+              location.pathname === (role === 'contractor' ? '/dashboard/contractor/settings' : '/dashboard/citizen/settings')
                 ? 'bg-blue-600 text-white'
                 : 'text-slate-600 hover:bg-slate-100'
             }`}

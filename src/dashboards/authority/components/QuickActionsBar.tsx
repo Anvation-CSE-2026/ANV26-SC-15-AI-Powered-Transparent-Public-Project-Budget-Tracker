@@ -65,6 +65,16 @@ export const QuickActionsBar: React.FC = () => {
           variant="outline"
           size="sm"
           className="text-xs text-slate-700 border-slate-200 hover:bg-slate-50"
+          leftIcon={<Building2 className="w-3.5 h-3.5 text-amber-600" />}
+          onClick={() => navigate('/dashboard/project-manager/submissions')}
+        >
+          Submissions
+        </Button>
+
+        <Button
+          variant="outline"
+          size="sm"
+          className="text-xs text-slate-700 border-slate-200 hover:bg-slate-50"
           leftIcon={<Building2 className="w-3.5 h-3.5 text-emerald-600" />}
           rightIcon={<ExternalLink className="w-3 h-3 text-slate-400" />}
           onClick={() => navigate('/dashboard/project-manager/projects')}

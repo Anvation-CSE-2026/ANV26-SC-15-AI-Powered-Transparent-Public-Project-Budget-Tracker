@@ -74,10 +74,12 @@ service cloud.firestore {
     // ==========================================
     // 3. Projects Collection (projects/{projectId})
     // ==========================================
-    match /projects/{projectId} {
-      // Public transparency: anyone authenticated can read public projects; Project Managers can read all
+      // Public transparency: anyone authenticated can read public projects;
+      // Project Managers can read all projects;
+      // Contractors can read projects officially assigned to them
       allow read: if isAuthenticated() && (
         isProjectManager() ||
+        (isContractor() && resource.data.contractorId == request.auth.uid) ||
         resource.data.isPublic == true
       );
 
@@ -242,17 +244,26 @@ service cloud.firestore {
     }
 
     // ==========================================
-    // 7. Contractor Updates (contractorUpdates/{updateId})
+    // 7. Contractor Project Submissions (projectSubmissions/{submissionId})
     // ==========================================
-    match /contractorUpdates/{updateId} {
-      allow read: if isAuthenticated();
+    match /projectSubmissions/{submissionId} {
+      // Contractors can read ONLY their own submissions; Project Managers can read all
+      allow read: if isAuthenticated() && (
+        isProjectManager() ||
+        (isContractor() && resource.data.contractorId == request.auth.uid)
+      );
 
-      // Contractor can submit updates only for themselves
+      // Contractors can create submissions strictly for projects assigned to them
+      // Cannot self-approve or start with status other than 'Submitted'
       allow create: if isContractor() &&
-                    request.resource.data.contractorId == request.auth.uid;
+                    request.resource.data.contractorId == request.auth.uid &&
+                    request.resource.data.status == 'Submitted';
 
-      // Only Project Manager can approve or reject submissions
+      // Only authorized Project Managers can review (Approve / Reject / Request Changes)
+      // Contractors CANNOT update or self-approve submissions once submitted
       allow update: if isProjectManager();
+
+      // Deletion strictly limited to Project Managers
       allow delete: if isProjectManager();
     }
 

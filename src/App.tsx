@@ -48,7 +48,16 @@ import { AuthorityProjectsPage } from './pages/authority/AuthorityProjectsPage';
 import { CreateProjectPage } from './pages/authority/CreateProjectPage';
 import { AuthorityProjectDetailPage } from './pages/authority/AuthorityProjectDetailPage';
 import { EditProjectPage } from './pages/authority/EditProjectPage';
+import { AuthoritySubmissionsQueuePage } from './pages/authority/AuthoritySubmissionsQueuePage';
+import { AuthoritySubmissionDetailPage } from './pages/authority/AuthoritySubmissionDetailPage';
 import { ContractorDashboardShell } from './pages/dashboards/ContractorDashboardShell';
+import { ContractorProjectsPage } from './pages/contractor/ContractorProjectsPage';
+import { ContractorProjectDetailPage } from './pages/contractor/ContractorProjectDetailPage';
+import { CreateSubmissionPage } from './pages/contractor/CreateSubmissionPage';
+import { ContractorSubmissionsPage } from './pages/contractor/ContractorSubmissionsPage';
+import { ContractorSubmissionDetailPage } from './pages/contractor/ContractorSubmissionDetailPage';
+import { ContractorProfilePage } from './pages/contractor/ContractorProfilePage';
+import { ContractorSettingsPage } from './pages/contractor/ContractorSettingsPage';
 
 // Root Route Handler
 const RootRoute: React.FC = () => {
@@ -480,6 +489,36 @@ export const App: React.FC = () => {
             }
           />
 
+          {/* PHASE 8: AUTHORITY CONTRACTOR SUBMISSION QUEUE */}
+          <Route
+            path="/dashboard/project-manager/submissions"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['project_manager']}>
+                  <Layout>
+                    <AuthoritySubmissionsQueuePage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/project-manager/submissions/:submissionId"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['project_manager']}>
+                  <Layout>
+                    <AuthoritySubmissionDetailPage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* ========================================================= */}
+          {/* PHASE 8: CONTRACTOR DASHBOARD & WORKFLOW ROUTES           */}
+          {/* ========================================================= */}
           <Route
             path="/dashboard/contractor"
             element={
@@ -487,6 +526,97 @@ export const App: React.FC = () => {
                 <RoleGuard allowedRoles={['contractor']}>
                   <Layout>
                     <ContractorDashboardShell />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/contractor/projects"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['contractor']}>
+                  <Layout>
+                    <ContractorProjectsPage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/contractor/projects/:projectId"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['contractor']}>
+                  <Layout>
+                    <ContractorProjectDetailPage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/contractor/projects/:projectId/submit"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['contractor']}>
+                  <Layout>
+                    <CreateSubmissionPage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/contractor/submissions"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['contractor']}>
+                  <Layout>
+                    <ContractorSubmissionsPage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/contractor/submissions/:submissionId"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['contractor']}>
+                  <Layout>
+                    <ContractorSubmissionDetailPage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/contractor/profile"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['contractor']}>
+                  <Layout>
+                    <ContractorProfilePage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/contractor/settings"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['contractor']}>
+                  <Layout>
+                    <ContractorSettingsPage />
                   </Layout>
                 </RoleGuard>
               </ProtectedRoute>

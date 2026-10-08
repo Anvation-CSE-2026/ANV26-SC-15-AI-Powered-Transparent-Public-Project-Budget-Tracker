@@ -1,0 +1,55 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function getUserData() {
+      return firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isProjectManager() {
+      return isAuthenticated() && getUserData().role == 'project_manager';
+    }
+
+    function isContractor() {
+      return isAuthenticated() && getUserData().role == 'contractor';
+    }
+
+    // Projects Contractor Submissions Evidence Path
+    match /projects/{projectId}/contractor-submissions/{submissionId}/{fileId} {
+      // Project Managers and authenticated Contractors can read evidence files
+      allow read: if isAuthenticated() && (isProjectManager() || isContractor());
+
+      // Only Contractors can upload evidence files (max 10MB, valid MIME type)
+      allow write: if isContractor() &&
+                   request.resource.size < 10 * 1024 * 1024 &&
+                   request.resource.contentType.matches('image/.*|application/pdf');
+    }
+
+    // Complaints attachments
+    match /complaints/{complaintId}/{folder}/{fileId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && request.resource.size < 10 * 1024 * 1024;
+    }
+
+    // Suggestions attachments
+    match /suggestions/{suggestionId}/{folder}/{fileId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && request.resource.size < 10 * 1024 * 1024;
+    }
+
+    // Public projects documents & photos
+    match /projects/{projectId}/{folder}/{fileId} {
+      allow read: if isAuthenticated();
+      allow write: if isProjectManager() && request.resource.size < 25 * 1024 * 1024;
+    }
+
+    // Default deny
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

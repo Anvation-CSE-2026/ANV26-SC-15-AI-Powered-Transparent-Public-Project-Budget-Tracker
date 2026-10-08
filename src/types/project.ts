@@ -228,6 +228,7 @@ export interface UpdateProjectInput {
   estimatedCost?: number;
   actualSpending?: number;
   progress?: number;
+  delayDays?: number;
   status?: ProjectStatus;
   isPublic?: boolean;
 }
