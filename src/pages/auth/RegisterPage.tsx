@@ -1,31 +1,34 @@
 import React, { useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Eye, Lock, Mail, User, ArrowRight, ShieldCheck, HardHat, Building2 } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Eye, EyeOff, Lock, Mail, User, ArrowRight, ShieldCheck, HardHat, Building2 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { Button } from '../../components/common/Button';
 import { Input } from '../../components/common/Input';
 import { Toast } from '../../components/common/Toast';
+import { Modal } from '../../components/common/Modal';
 import { getFriendlyAuthErrorMessage } from '../../utils/authErrors';
 import { getDashboardRouteForRole } from '../../routes/routeConfig';
+import { verifyAdminAccessCode } from '../../config/adminAccess';
 import type { UserRole } from '../../types';
 
 export const RegisterPage: React.FC = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
 
   // Controlled admin registration mode
-  const [isAdminMode, setIsAdminMode] = useState<boolean>(
-    () => searchParams.get('mode') === 'admin'
-  );
+  const [isAdminMode, setIsAdminMode] = useState<boolean>(false);
+
+  // Admin access gate modal state
+  const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
+  const [adminPasscode, setAdminPasscode] = useState('');
+  const [showAdminPass, setShowAdminPass] = useState(false);
+  const [adminPasscodeError, setAdminPasscodeError] = useState<string | null>(null);
 
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [role, setRole] = useState<UserRole>(() =>
-    searchParams.get('mode') === 'admin' ? 'project_manager' : 'citizen'
-  );
+  const [role, setRole] = useState<UserRole>('citizen');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -109,6 +112,21 @@ export const RegisterPage: React.FC = () => {
     }
   };
 
+  const handleAdminGateSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!verifyAdminAccessCode(adminPasscode)) {
+      setAdminPasscodeError('Invalid admin access password.');
+      return;
+    }
+
+    setIsAdminModalOpen(false);
+    setAdminPasscode('');
+    setAdminPasscodeError(null);
+    setIsAdminMode(true);
+    setRole('project_manager');
+    setFieldErrors({});
+  };
+
   // Controlled role options available only in Admin / Authorized flow
   const adminRoleOptions: Array<{
     id: UserRole;
@@ -132,6 +150,82 @@ export const RegisterPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-blue-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      {/* Admin Access Password Gate Modal */}
+      <Modal
+        isOpen={isAdminModalOpen}
+        onClose={() => {
+          setIsAdminModalOpen(false);
+          setAdminPasscode('');
+          setAdminPasscodeError(null);
+        }}
+        title="Admin Access"
+        maxWidth="sm"
+      >
+        <form onSubmit={handleAdminGateSubmit} className="space-y-4 text-left">
+          <p className="text-xs text-slate-600 leading-relaxed">
+            Enter the admin access password to continue.
+          </p>
+
+          <div className="space-y-1.5">
+            <div className="relative rounded-xl border border-slate-200 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100 transition-all bg-white overflow-hidden shadow-xs">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <Lock className="w-4 h-4" />
+              </div>
+              <input
+                type={showAdminPass ? 'text' : 'password'}
+                autoFocus
+                required
+                value={adminPasscode}
+                onChange={(e) => {
+                  setAdminPasscode(e.target.value);
+                  if (adminPasscodeError) setAdminPasscodeError(null);
+                }}
+                placeholder="Password"
+                autoComplete="current-password"
+                className="w-full pl-10 pr-10 py-2.5 text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-hidden bg-transparent"
+              />
+              <button
+                type="button"
+                onClick={() => setShowAdminPass((prev) => !prev)}
+                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer"
+                aria-label={showAdminPass ? 'Hide password' : 'Show password'}
+              >
+                {showAdminPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+
+            {adminPasscodeError && (
+              <p className="text-xs text-rose-600 font-medium animate-in fade-in">
+                {adminPasscodeError}
+              </p>
+            )}
+          </div>
+
+          <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setIsAdminModalOpen(false);
+                setAdminPasscode('');
+                setAdminPasscodeError(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              size="sm"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-medium"
+            >
+              Continue
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
       <div className="sm:mx-auto sm:w-full sm:max-w-xl px-4">
         {/* CivicSight Brand Logo */}
         <div className="flex items-center justify-center gap-2.5 mb-2">
@@ -172,7 +266,7 @@ export const RegisterPage: React.FC = () => {
           )}
 
           <form className="space-y-4" onSubmit={handleSubmit}>
-            {/* Controlled Admin Role Selection (Only shown when Admin Portal is clicked) */}
+            {/* Controlled Admin Role Selection (Only shown when Admin Portal is unlocked) */}
             {isAdminMode && (
               <div className="p-4 bg-slate-50/90 rounded-xl border border-slate-200/80 space-y-3 animate-in fade-in duration-200">
                 <div className="flex items-center justify-between">
@@ -314,9 +408,9 @@ export const RegisterPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => {
-                    setIsAdminMode(true);
-                    setRole('project_manager');
-                    setFieldErrors({});
+                    setIsAdminModalOpen(true);
+                    setAdminPasscode('');
+                    setAdminPasscodeError(null);
                   }}
                   aria-label="Admin and authorized personnel registration"
                   className="text-[11px] text-slate-400 hover:text-slate-600 transition-colors cursor-pointer focus:outline-hidden focus:underline select-none"

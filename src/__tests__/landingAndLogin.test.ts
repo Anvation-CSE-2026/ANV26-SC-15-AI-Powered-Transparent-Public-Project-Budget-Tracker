@@ -64,4 +64,14 @@ describe('Landing Page & Login Redesign Component Specifications', () => {
     expect(roleRoutes['project_manager']).toBe('/dashboard/project-manager');
     expect(roleRoutes['contractor']).toBe('/dashboard/contractor');
   });
+
+  it('validates the isolated admin access password gate verification', async () => {
+    const { verifyAdminAccessCode, DEMO_ADMIN_ACCESS_CODE } = await import('../config/adminAccess');
+    expect(DEMO_ADMIN_ACCESS_CODE).toBe('123456');
+    expect(verifyAdminAccessCode('123456')).toBe(true);
+    expect(verifyAdminAccessCode(' 123456 ')).toBe(true);
+    expect(verifyAdminAccessCode('wrongpass')).toBe(false);
+    expect(verifyAdminAccessCode('')).toBe(false);
+    expect(verifyAdminAccessCode('12345')).toBe(false);
+  });
 });
