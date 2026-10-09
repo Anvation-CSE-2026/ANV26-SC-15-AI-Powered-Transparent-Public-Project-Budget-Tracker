@@ -6,7 +6,14 @@ import { buildGroundedContext, sanitizeQuery } from '../utils/aiContextBuilder';
 import { getProjects } from '../api/projectService';
 import { getAllComplaints } from '../api/complaintService';
 
-export const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+function getEnvVar(key: string): string | undefined {
+  if (typeof process !== 'undefined' && process && process.env) {
+    return process.env[key];
+  }
+  return undefined;
+}
+
+export const GEMINI_MODEL = getEnvVar('GEMINI_MODEL') || 'gemini-2.5-flash';
 
 /**
  * Server-side handler for CivicSight Gemini AI Assistant requests.
@@ -83,7 +90,7 @@ export async function handleGeminiChatRequest(
   }
 
   // 5. Check if server-side GEMINI_API_KEY is configured
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = getEnvVar('GEMINI_API_KEY');
 
   if (!apiKey || apiKey === 'your_gemini_api_key_here') {
     // Generate deterministic grounded fallback response based on real data

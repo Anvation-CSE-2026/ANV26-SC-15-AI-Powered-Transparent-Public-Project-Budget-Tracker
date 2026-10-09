@@ -8,28 +8,23 @@ import { LoginCard } from '../../components/auth/LoginCard';
 export const LoginPage: React.FC = () => {
   return (
     <HeroBackground>
-      {/* 1. Top Brand & Pillar Navigation */}
       <TopNavigation />
 
-      {/* 2. Main Center Hero Area with Floating Login Card & Campaign Message */}
       <main
         role="main"
         className="relative flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-12 py-4 sm:py-6"
       >
         <div className="w-full max-w-7xl mx-auto relative flex items-center justify-center">
-          {/* Centered Premium Login Card */}
           <div className="relative z-10 w-full flex justify-center">
             <LoginCard />
           </div>
 
-          {/* Right-Side Smart City Campaign Message (Desktop Only) */}
           <div className="hidden lg:block absolute right-2 xl:right-8 top-1/2 -translate-y-1/2">
             <HeroMessage />
           </div>
         </div>
       </main>
 
-      {/* 3. Bottom 4-Pillar Feature Strip */}
       <FeatureHighlights />
     </HeroBackground>
   );

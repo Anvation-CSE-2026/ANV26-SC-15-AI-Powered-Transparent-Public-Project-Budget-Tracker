@@ -6,7 +6,6 @@ import {
   Eye,
   EyeOff,
   ArrowRight,
-  Info,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { CivicSightLogo } from '../brand/CivicSightLogo';
@@ -17,7 +16,7 @@ import { getDashboardRouteForRole } from '../../routes/routeConfig';
 const REMEMBER_ME_KEY = 'civicsight_remembered_username';
 
 export const LoginCard: React.FC = () => {
-  const { login, isAuthenticated, role, isFirebaseConfigured } = useAuth();
+  const { login, isAuthenticated, role } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -40,7 +39,6 @@ export const LoginCard: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated && role) {
       const from = (location.state as { from?: { pathname: string } })?.from?.pathname;
@@ -63,7 +61,6 @@ export const LoginCard: React.FC = () => {
       return;
     }
 
-    // Persist or clear remember me preference
     if (rememberMe) {
       localStorage.setItem(REMEMBER_ME_KEY, trimmedUsername);
     } else {
@@ -86,7 +83,6 @@ export const LoginCard: React.FC = () => {
   return (
     <div className="w-full max-w-[440px] mx-auto animate-in fade-in zoom-in-95 duration-500">
       <div className="bg-white/95 backdrop-blur-xl rounded-3xl p-7 sm:p-9 shadow-2xl shadow-slate-950/25 border border-white/80">
-        {/* Brand Header */}
         <div className="flex flex-col items-center text-center mb-7">
           <CivicSightLogo
             size="lg"
@@ -96,7 +92,6 @@ export const LoginCard: React.FC = () => {
           />
         </div>
 
-        {/* Error Notification */}
         {errorMessage && (
           <div className="mb-5 animate-in fade-in duration-200">
             <Toast
@@ -108,57 +103,7 @@ export const LoginCard: React.FC = () => {
           </div>
         )}
 
-        {/* Dev Mode Notification if Firebase not configured */}
-        {!isFirebaseConfigured && (
-          <div className="mb-5 p-3 rounded-2xl bg-blue-50/90 border border-blue-200/80 text-xs text-blue-900 space-y-2">
-            <div className="flex items-start gap-2">
-              <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-              <div>
-                <p className="font-semibold text-blue-950 text-xs">Demo Accounts (Password: 123456)</p>
-                <p className="text-[11px] text-blue-700">Click to fill credentials and test any role:</p>
-              </div>
-            </div>
-            <div className="grid grid-cols-3 gap-1.5 pt-0.5">
-              <button
-                type="button"
-                onClick={() => {
-                  setUsername('aarav');
-                  setPassword('123456');
-                }}
-                className="py-1 px-1.5 rounded-lg bg-white border border-blue-200 hover:border-blue-400 hover:bg-blue-100/60 text-[11px] font-medium text-blue-900 transition-colors shadow-2xs text-center cursor-pointer"
-                title="Fill Citizen credentials (aarav / 123456)"
-              >
-                👤 Citizen
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setUsername('pm_authority');
-                  setPassword('123456');
-                }}
-                className="py-1 px-1.5 rounded-lg bg-white border border-blue-200 hover:border-blue-400 hover:bg-blue-100/60 text-[11px] font-medium text-blue-900 transition-colors shadow-2xs text-center cursor-pointer"
-                title="Fill Authority / PM credentials (pm_authority / 123456)"
-              >
-                🛡️ Authority
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setUsername('contractor_apex');
-                  setPassword('123456');
-                }}
-                className="py-1 px-1.5 rounded-lg bg-white border border-blue-200 hover:border-blue-400 hover:bg-blue-100/60 text-[11px] font-medium text-blue-900 transition-colors shadow-2xs text-center cursor-pointer"
-                title="Fill Contractor credentials (contractor_apex / 123456)"
-              >
-                👷 Contractor
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Login Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Username Input */}
           <div className="space-y-1.5">
             <label
               htmlFor="username"
@@ -183,7 +128,6 @@ export const LoginCard: React.FC = () => {
             </div>
           </div>
 
-          {/* Password Input */}
           <div className="space-y-1.5">
             <label
               htmlFor="password"
@@ -216,7 +160,6 @@ export const LoginCard: React.FC = () => {
             </div>
           </div>
 
-          {/* Remember me & Forgot Password */}
           <div className="flex items-center justify-between text-xs pt-1">
             <label className="flex items-center gap-2 cursor-pointer select-none text-slate-600">
               <input
@@ -236,7 +179,6 @@ export const LoginCard: React.FC = () => {
             </Link>
           </div>
 
-          {/* Primary Action Button: [ -> Sign In ] */}
           <div className="pt-2">
             <button
               type="submit"
@@ -258,7 +200,6 @@ export const LoginCard: React.FC = () => {
           </div>
         </form>
 
-        {/* Registration Footer */}
         <div className="mt-6 pt-5 border-t border-slate-100 text-center">
           <p className="text-xs text-slate-500">
             Don&apos;t have an account?{' '}

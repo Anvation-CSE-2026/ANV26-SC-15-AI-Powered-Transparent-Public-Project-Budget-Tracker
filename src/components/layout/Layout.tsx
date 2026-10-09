@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Navbar } from './Navbar';
 import { Sidebar } from './Sidebar';
 import { MobileNavigation } from './MobileNavigation';
+import { ErrorBoundary } from '../common/ErrorBoundary';
 
 export interface LayoutProps {
   children: React.ReactNode;
@@ -29,7 +30,9 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         {/* Content View */}
         <main className="flex-1 lg:pl-64 flex flex-col min-w-0 pb-20 lg:pb-8">
           <div className="flex-1 px-4 sm:px-6 lg:px-8 py-6 max-w-7xl w-full mx-auto">
-            {children}
+            <ErrorBoundary>
+              {children}
+            </ErrorBoundary>
           </div>
 
           {/* Civic Footer */}
