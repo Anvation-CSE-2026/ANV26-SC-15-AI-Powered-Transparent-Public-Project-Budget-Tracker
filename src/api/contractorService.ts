@@ -30,6 +30,7 @@ import {
   updateMilestone,
 } from './projectService';
 import { createNotification } from './notificationService';
+import { logAuditEvent } from './auditService';
 
 const LOCAL_STORAGE_SUBMISSIONS = 'civicsight_local_contractor_submissions';
 
@@ -286,6 +287,22 @@ export async function createContractorSubmission(
     entityNumber: submissionNumber,
     actionUrl: `/dashboard/contractor/submissions/${submissionId}`,
     priority: 'normal',
+  });
+
+  // Record governance audit log entry
+  void logAuditEvent({
+    actorUid: contractorUser.uid,
+    actorName: contractorUser.displayName || contractorUser.username,
+    actorRole: 'contractor',
+    actionType: 'contractor_submission_created',
+    actionTitle: `Contractor Submission Filed: ${submissionNumber}`,
+    entityType: 'submission',
+    entityId: submissionId,
+    entityNumber: submissionNumber,
+    summary: `Contractor submitted "${submission.title}" (${input.type}) for ${project.name}.`,
+    beforeState: { projectProgress: project.progress, projectStatus: project.status },
+    afterState: { requestedProgress: input.progress, submissionStatus: 'Submitted' },
+    isPublic: true,
   });
 
   return submission;
@@ -605,6 +622,29 @@ export async function reviewSubmission(
     entityNumber: submission.submissionNumber,
     actionUrl: `/dashboard/contractor/submissions/${submission.id}`,
     priority: input.decision === 'Approved' ? 'normal' : 'high',
+  });
+
+  // Record governance audit log entry
+  void logAuditEvent({
+    actorUid: pmUser.uid,
+    actorName: pmUser.displayName || pmUser.username,
+    actorRole: 'project_manager',
+    actionType:
+      input.decision === 'Approved'
+        ? 'contractor_submission_approved'
+        : input.decision === 'Rejected'
+        ? 'contractor_submission_rejected'
+        : 'contractor_submission_changes_requested',
+    actionTitle: `Submission ${input.decision}: ${submission.submissionNumber}`,
+    entityType: 'submission',
+    entityId: submission.id,
+    entityNumber: submission.submissionNumber,
+    summary:
+      input.remarks?.trim() ||
+      `Submission ${submission.submissionNumber} review completed with decision: ${input.decision}.`,
+    beforeState: { status: submission.status },
+    afterState: { status: input.decision, remarks: input.remarks },
+    isPublic: true,
   });
 
   return updatedSubmission;

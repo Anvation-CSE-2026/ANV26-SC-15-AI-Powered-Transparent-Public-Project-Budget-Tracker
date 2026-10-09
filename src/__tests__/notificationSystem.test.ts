@@ -445,8 +445,8 @@ describe('Phase 12: Complete Notification System Tests', () => {
           projectId: 'prj-seed-1',
           type: 'Progress Update',
           title: 'Sub-base Layer Compaction Done',
-          description: 'Completed 80% compaction on Section 2',
-          progress: 80,
+          description: 'Completed 85% compaction on Section 2',
+          progress: 85,
         },
         testContractorUser
       );

@@ -25,6 +25,7 @@ import type { UserProfile } from '../types';
 import { generateComplaintNumber } from '../utils/complaintIdGenerator';
 import { calculateSLAStatus } from '../utils/slaCalculator';
 import { createNotification } from './notificationService';
+import { logAuditEvent } from './auditService';
 
 const LOCAL_STORAGE_COMPLAINTS = 'civicsight_local_complaints';
 const LOCAL_STORAGE_UPDATES = 'civicsight_local_complaint_updates';
@@ -430,6 +431,22 @@ export async function createComplaint(
     priority: newComplaint.priority === 'emergency' ? 'urgent' : 'normal',
   });
 
+  // Record audit log entry
+  void logAuditEvent({
+    actorUid: user.uid,
+    actorName: user.displayName || user.username,
+    actorRole: user.role,
+    actionType: 'complaint_created',
+    actionTitle: `Grievance Registered: ${complaintNumber}`,
+    entityType: 'complaint',
+    entityId: complaintId,
+    entityNumber: complaintNumber,
+    summary: `Citizen reported "${newComplaint.title}" (${newComplaint.category}) in ${newComplaint.location.ward || 'city'}.`,
+    beforeState: null,
+    afterState: { category: newComplaint.category, priority: newComplaint.priority, status: 'submitted' },
+    isPublic: true,
+  });
+
   return newComplaint;
 }
 
@@ -733,6 +750,21 @@ export async function assignDepartmentAndOfficer(
       actionUrl: `/dashboard/citizen/complaints/${complaintId}`,
       priority: priority === 'emergency' ? 'urgent' : 'normal',
     });
+
+    void logAuditEvent({
+      actorUid: authorityUser.uid,
+      actorName: authorityUser.displayName || authorityUser.username,
+      actorRole: 'project_manager',
+      actionType: 'complaint_assigned',
+      actionTitle: `Grievance Assigned: ${c.complaintNumber}`,
+      entityType: 'complaint',
+      entityId: complaintId,
+      entityNumber: c.complaintNumber,
+      summary: `Assigned grievance to ${deptName} (${officerName}) with ${slaHours}h resolution SLA.`,
+      beforeState: { status: c.status },
+      afterState: { status: 'assigned', department: deptName, officer: officerName, slaHours },
+      isPublic: true,
+    });
   }
 }
 
@@ -794,6 +826,21 @@ export async function updateComplaintStatus(
       actionUrl: `/dashboard/citizen/complaints/${complaintId}`,
       priority: newStatus === 'in_progress' ? 'high' : 'normal',
     });
+
+    void logAuditEvent({
+      actorUid: authorityUser.uid,
+      actorName: authorityUser.displayName || authorityUser.username,
+      actorRole: 'project_manager',
+      actionType: newStatus === 'resolved' ? 'complaint_resolved' : 'complaint_status_changed',
+      actionTitle: `Grievance Status: ${newStatus.replace('_', ' ').toUpperCase()}`,
+      entityType: 'complaint',
+      entityId: complaintId,
+      entityNumber: c.complaintNumber,
+      summary: message || `Status of ${c.complaintNumber} updated to ${newStatus}.`,
+      beforeState: { status: c.status },
+      afterState: { status: newStatus },
+      isPublic: true,
+    });
   }
 }
 
@@ -827,6 +874,18 @@ export async function addInternalNote(
     localUpdates[complaintId].push(noteLog);
     saveLocalUpdates(localUpdates);
   }
+
+  void logAuditEvent({
+    actorUid: authorityUser.uid,
+    actorName: authorityUser.displayName || authorityUser.username,
+    actorRole: 'project_manager',
+    actionType: 'complaint_status_changed',
+    actionTitle: 'Internal Authority Note Appended',
+    entityType: 'complaint',
+    entityId: complaintId,
+    summary: note.substring(0, 100),
+    isPublic: false,
+  });
 }
 
 /**

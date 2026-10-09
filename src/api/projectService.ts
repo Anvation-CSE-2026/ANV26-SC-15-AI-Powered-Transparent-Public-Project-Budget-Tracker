@@ -30,6 +30,7 @@ import type { UserProfile } from '../types';
 import { generateProjectNumber } from '../utils/projectIdGenerator';
 import { calculateBudgetDeviation, calculateDelayDays, calculateCivicSightRisk } from '../utils/calculations';
 import { createNotification } from './notificationService';
+import { logAuditEvent } from './auditService';
 
 const LOCAL_STORAGE_PROJECTS = 'civicsight_local_projects';
 const LOCAL_STORAGE_MILESTONES = 'civicsight_local_project_milestones';
@@ -89,12 +90,12 @@ function getInitialSeedProjects(): Record<string, Project> {
     startDate: '2026-01-15',
     plannedCompletionDate: '2026-11-30',
     expectedCompletionDate: '2026-11-30',
-    approvedBudget: 12.5, // 12.5 Cr
-    estimatedCost: 12.2,
-    actualSpending: 8.75,
-    progress: 72,
-    expectedProgress: 70,
-    budgetDeviation: calculateBudgetDeviation(12.5, 8.75),
+    approvedBudget: 10.0, // 10.0 Cr
+    estimatedCost: 10.0,
+    actualSpending: 9.2,
+    progress: 82,
+    expectedProgress: 80,
+    budgetDeviation: calculateBudgetDeviation(10.0, 9.2),
     delayDays: 0,
     status: 'Ongoing',
     isPublic: true,
@@ -102,7 +103,7 @@ function getInitialSeedProjects(): Record<string, Project> {
     riskLabel: 'Normal',
     milestonesCount: 5,
     completedMilestonesCount: 3,
-    issuesCount: 2,
+    issuesCount: 1,
     unresolvedIssuesCount: 0,
     createdAt: '2026-01-10T10:00:00.000Z',
     updatedAt: '2026-03-28T14:30:00.000Z',
@@ -132,19 +133,19 @@ function getInitialSeedProjects(): Record<string, Project> {
     expectedCompletionDate: '2026-06-30',
     approvedBudget: 8.0, // 8.0 Cr
     estimatedCost: 8.5,
-    actualSpending: 9.4,
+    actualSpending: 10.1,
     progress: 58,
     expectedProgress: 80,
-    budgetDeviation: calculateBudgetDeviation(8.0, 9.4),
+    budgetDeviation: calculateBudgetDeviation(8.0, 10.1),
     delayDays: 45,
     status: 'Delayed',
     isPublic: true,
-    riskScore: 3,
+    riskScore: 4,
     riskLabel: 'High Attention',
     milestonesCount: 4,
     completedMilestonesCount: 2,
-    issuesCount: 3,
-    unresolvedIssuesCount: 2,
+    issuesCount: 7,
+    unresolvedIssuesCount: 3,
     createdAt: '2025-10-25T09:00:00.000Z',
     updatedAt: '2026-03-25T11:20:00.000Z',
   };
@@ -575,7 +576,7 @@ function getInitialSeedActivities(): Record<string, ProjectActivity[]> {
         id: 'act-101',
         projectId: 'prj-seed-1',
         action: 'PROJECT_CREATED',
-        description: 'Project PRJ-2026-00101 sanctioned with approved budget ₹12.50 Cr.',
+        description: 'Project PRJ-2026-00101 sanctioned with approved budget ₹10.00 Cr.',
         actorId: 'pm-seed-1',
         actorName: 'Er. Rajesh Deshmukh',
         actorRole: 'project_manager',
@@ -843,6 +844,21 @@ export async function createProject(
     author
   );
 
+  void logAuditEvent({
+    actorUid: author.uid,
+    actorName: author.displayName || author.username,
+    actorRole: author.role,
+    actionType: 'project_created',
+    actionTitle: `Project Created: ${projectNumber}`,
+    entityType: 'project',
+    entityId: projectId,
+    entityNumber: projectNumber,
+    summary: `Project "${newProject.name}" sanctioned with approved budget ₹${newProject.approvedBudget} Cr.`,
+    beforeState: null,
+    afterState: { approvedBudget: newProject.approvedBudget, status: newProject.status, category: newProject.category },
+    isPublic: newProject.isPublic,
+  });
+
   return newProject;
 }
 
@@ -909,6 +925,21 @@ export async function updateProject(
     `Project updated by ${actor.displayName || actor.username} (${actor.role})`,
     actor
   );
+
+  void logAuditEvent({
+    actorUid: actor.uid,
+    actorName: actor.displayName || actor.username,
+    actorRole: actor.role,
+    actionType: input.status && input.status !== existing.status ? 'project_status_changed' : 'project_updated',
+    actionTitle: `Project Updated: ${existing.projectNumber}`,
+    entityType: 'project',
+    entityId: projectId,
+    entityNumber: existing.projectNumber,
+    summary: `Project updated by ${actor.displayName || actor.username} (${actor.role}). Progress: ${updatedProject.progress}%, Status: ${updatedProject.status}.`,
+    beforeState: { progress: existing.progress, status: existing.status, spending: existing.actualSpending },
+    afterState: { progress: updatedProject.progress, status: updatedProject.status, spending: updatedProject.actualSpending },
+    isPublic: updatedProject.isPublic,
+  });
 
   return updatedProject;
 }

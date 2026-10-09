@@ -20,25 +20,49 @@ service firebase.storage {
 
     // Projects Contractor Submissions Evidence Path
     match /projects/{projectId}/contractor-submissions/{submissionId}/{fileId} {
-      // Project Managers and authenticated Contractors can read evidence files
       allow read: if isAuthenticated() && (isProjectManager() || isContractor());
-
-      // Only Contractors can upload evidence files (max 10MB, valid MIME type)
       allow write: if isContractor() &&
                    request.resource.size < 10 * 1024 * 1024 &&
                    request.resource.contentType.matches('image/.*|application/pdf');
     }
 
-    // Complaints attachments
+    // Direct contractor submissions path
+    match /contractor_submissions/{submissionId}/{filename} {
+      allow read: if isAuthenticated() && (isProjectManager() || isContractor());
+      allow write: if isAuthenticated() && (isContractor() || isProjectManager()) &&
+                   request.resource.size < 10 * 1024 * 1024 &&
+                   request.resource.contentType.matches('image/.*|application/pdf');
+    }
+
+    // Project Milestone verification proof path
+    match /projects/{projectId}/milestones/{milestoneId}/{filename} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && (isContractor() || isProjectManager()) &&
+                   request.resource.size < 10 * 1024 * 1024 &&
+                   request.resource.contentType.matches('image/.*|application/pdf');
+    }
+
+    // Complaints attachments (evidence photos)
+    match /complaints/{complaintId}/{filename} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() &&
+                   request.resource.size < 10 * 1024 * 1024 &&
+                   request.resource.contentType.matches('image/.*|application/pdf');
+    }
+
     match /complaints/{complaintId}/{folder}/{fileId} {
       allow read: if isAuthenticated();
-      allow write: if isAuthenticated() && request.resource.size < 10 * 1024 * 1024;
+      allow write: if isAuthenticated() &&
+                   request.resource.size < 10 * 1024 * 1024 &&
+                   request.resource.contentType.matches('image/.*|application/pdf');
     }
 
     // Suggestions attachments
     match /suggestions/{suggestionId}/{folder}/{fileId} {
       allow read: if isAuthenticated();
-      allow write: if isAuthenticated() && request.resource.size < 10 * 1024 * 1024;
+      allow write: if isAuthenticated() &&
+                   request.resource.size < 10 * 1024 * 1024 &&
+                   request.resource.contentType.matches('image/.*|application/pdf');
     }
 
     // Public projects documents & photos

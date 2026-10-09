@@ -267,6 +267,45 @@ service cloud.firestore {
       allow delete: if isProjectManager();
     }
 
+    // ==========================================
+    // 8. Audit Logs Collection (audit_logs/{auditId})
+    // Strictly Immutable Ledger for Governance
+    // ==========================================
+    match /audit_logs/{auditId} {
+      // PMs can inspect complete audit ledger; citizens can read public audit events
+      allow read: if isAuthenticated() && (
+        isProjectManager() ||
+        resource.data.isPublic == true
+      );
+
+      // Authenticated users and services can append audit logs
+      allow create: if isAuthenticated() &&
+                    request.resource.data.id is string &&
+                    request.resource.data.actionType is string &&
+                    request.resource.data.entityType is string;
+
+      // IMMUTABILITY GUARANTEE: Nobody can modify or erase an audit entry
+      allow update, delete: if false;
+    }
+
+    // ==========================================
+    // 9. Notifications Collection (notifications/{notificationId})
+    // ==========================================
+    match /notifications/{notificationId} {
+      // Recipient can read and update (mark read/dismiss) their own notifications
+      // PMs can read for operational triage
+      allow read: if isAuthenticated() && (
+        request.auth.uid == resource.data.recipientId ||
+        isProjectManager()
+      );
+
+      // Authenticated actors or services can create notifications
+      allow create: if isAuthenticated();
+
+      // Recipient can update (isRead status) or delete their own notification
+      allow update, delete: if isAuthenticated() && request.auth.uid == resource.data.recipientId;
+    }
+
     // Default deny for unhandled routes
     match /{document=**} {
       allow read, write: if false;

@@ -23,6 +23,7 @@ import {
   ExternalLink,
   ShieldCheck,
   MapPin,
+  History,
 } from 'lucide-react';
 import { formatCurrencyINR, formatDate, formatPercentage } from '../../utils/formatters';
 import {
@@ -33,6 +34,8 @@ import {
   getProjectDocuments,
   getProjectPhotos,
 } from '../../api/projectService';
+import { getProjectAuditHistory } from '../../api/auditService';
+import type { AuditLogEntry } from '../../types/audit';
 import type {
   Project,
   ProjectMilestone,
@@ -52,8 +55,9 @@ export const CitizenProjectDetailPage: React.FC = () => {
   const [issues, setIssues] = useState<ProjectIssue[]>([]);
   const [documents, setDocuments] = useState<ProjectDocument[]>([]);
   const [photos, setPhotos] = useState<ProjectPhoto[]>([]);
+  const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'milestones' | 'updates' | 'issues' | 'documents'>('milestones');
+  const [activeTab, setActiveTab] = useState<'milestones' | 'updates' | 'issues' | 'documents' | 'audit'>('milestones');
 
   useEffect(() => {
     let isMounted = true;
@@ -64,12 +68,13 @@ export const CitizenProjectDetailPage: React.FC = () => {
         if (!isMounted) return;
         setProject(p);
         if (p) {
-          const [ms, upds, isss, docs, phs] = await Promise.all([
+          const [ms, upds, isss, docs, phs, auds] = await Promise.all([
             getProjectMilestones(projectId),
             getProjectUpdates(projectId, false),
             getProjectIssues(projectId, false),
             getProjectDocuments(projectId, false),
             getProjectPhotos(projectId, false),
+            getProjectAuditHistory(projectId, true),
           ]);
           if (isMounted) {
             setMilestones(ms);
@@ -77,6 +82,7 @@ export const CitizenProjectDetailPage: React.FC = () => {
             setIssues(isss);
             setDocuments(docs);
             setPhotos(phs);
+            setAuditLogs(auds);
           }
         }
       } catch {
@@ -364,6 +370,18 @@ export const CitizenProjectDetailPage: React.FC = () => {
         >
           <FileText className="w-3.5 h-3.5" />
           <span>Public Documents &amp; Photos ({documents.length + photos.length})</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('audit')}
+          className={`px-4 py-2.5 text-xs font-semibold rounded-t-lg transition-all cursor-pointer whitespace-nowrap flex items-center gap-2 ${
+            activeTab === 'audit'
+              ? 'bg-white border border-b-0 border-slate-200 text-emerald-700 shadow-xs'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+          }`}
+        >
+          <History className="w-3.5 h-3.5" />
+          <span>Public Audit Trail ({auditLogs.length})</span>
         </button>
       </div>
 
@@ -683,6 +701,51 @@ export const CitizenProjectDetailPage: React.FC = () => {
             </CardContent>
           </Card>
         </div>
+      )}
+
+      {/* Tab 5: Public Activity & Audit Trail */}
+      {activeTab === 'audit' && (
+        <Card className="border-slate-200/80">
+          <CardHeader>
+            <div>
+              <CardTitle>Public Governance &amp; Action History</CardTitle>
+              <CardDescription>
+                Chronological, immutable audit record of sanctions, progress sign-offs, and administrative decisions.
+              </CardDescription>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {auditLogs.length === 0 ? (
+              <p className="text-xs text-slate-500 py-6 text-center">
+                No public activity events recorded yet for this project.
+              </p>
+            ) : (
+              <div className="relative border-l-2 border-emerald-200 ml-4 pl-6 space-y-6">
+                {auditLogs.map((entry) => (
+                  <div key={entry.id} className="relative">
+                    <div className="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-white border-2 border-emerald-500 flex items-center justify-center" />
+                    <div className="p-4 rounded-xl border border-slate-200/80 bg-white shadow-2xs space-y-2">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                        <span className="font-bold text-xs text-slate-900">{entry.actionTitle}</span>
+                        <span className="text-[10px] text-slate-400 font-mono">
+                          {new Date(entry.timestamp).toLocaleString()}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-600 leading-relaxed">{entry.summary}</p>
+                      <div className="flex items-center gap-2 pt-1 border-t border-slate-100 text-[10px] text-slate-500">
+                        <span>
+                          Actor: <strong className="text-slate-700">{entry.actorName}</strong>
+                        </span>
+                        <span>•</span>
+                        <span className="capitalize">{entry.actorRole.replace('_', ' ')}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
       )}
 
       {/* Citizen Feedback & Complaint Action Banner */}

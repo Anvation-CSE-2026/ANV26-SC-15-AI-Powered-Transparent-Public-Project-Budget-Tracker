@@ -71,6 +71,9 @@ import { AuthorityAIPage } from './pages/authority/AuthorityAIPage';
 import { AuthorityNotificationsPage } from './pages/authority/AuthorityNotificationsPage';
 import { ContractorNotificationsPage } from './pages/contractor/ContractorNotificationsPage';
 
+// Phase 13: Audit Trail & Governance Ledger Pages
+import { AuthorityAuditLogsPage } from './pages/authority/AuthorityAuditLogsPage';
+
 // Root Route Handler
 const RootRoute: React.FC = () => {
   const { isAuthenticated, role, loading } = useAuth();
@@ -587,6 +590,20 @@ export const App: React.FC = () => {
                 <RoleGuard allowedRoles={['project_manager']}>
                   <Layout>
                     <AuthorityNotificationsPage />
+                  </Layout>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* PHASE 13: AUTHORITY AUDIT LOGS & ACTIVITY HISTORY */}
+          <Route
+            path="/dashboard/project-manager/audit-logs"
+            element={
+              <ProtectedRoute>
+                <RoleGuard allowedRoles={['project_manager']}>
+                  <Layout>
+                    <AuthorityAuditLogsPage />
                   </Layout>
                 </RoleGuard>
               </ProtectedRoute>

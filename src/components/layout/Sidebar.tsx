@@ -66,7 +66,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'contractor-submissions', label: 'Contractor Submissions', path: '/dashboard/project-manager/submissions', icon: <HardHat className="w-4 h-4" />, badge: 'Queue' },
     { id: 'gis-map', label: 'GIS Location Map', path: '/dashboard/project-manager/map', icon: <MapPin className="w-4 h-4" />, badge: 'GIS' },
     { id: 'authority-notifications', label: 'Alerts & Notifications', path: '/dashboard/project-manager/notifications', icon: <Bell className="w-4 h-4" /> },
-    { id: 'audit-logs', label: 'Audit Trail', path: '/design-system', icon: <History className="w-4 h-4" /> },
+    { id: 'audit-logs', label: 'Audit Trail', path: '/dashboard/project-manager/audit-logs', icon: <History className="w-4 h-4" />, badge: 'Ledger' },
   ];
 
   const contractorItems: NavItem[] = [
