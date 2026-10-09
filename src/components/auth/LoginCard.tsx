@@ -110,11 +110,49 @@ export const LoginCard: React.FC = () => {
 
         {/* Dev Mode Notification if Firebase not configured */}
         {!isFirebaseConfigured && (
-          <div className="mb-5 p-2.5 rounded-xl bg-blue-50/80 border border-blue-200 text-[11px] text-blue-900 flex items-start gap-2">
-            <Info className="w-3.5 h-3.5 text-blue-600 shrink-0 mt-0.5" />
-            <p>
-              <strong className="font-semibold">Local Session Store:</strong> Firebase keys not configured. Local session credentials active.
-            </p>
+          <div className="mb-5 p-3 rounded-2xl bg-blue-50/90 border border-blue-200/80 text-xs text-blue-900 space-y-2">
+            <div className="flex items-start gap-2">
+              <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-blue-950 text-xs">Demo Accounts (Password: 123456)</p>
+                <p className="text-[11px] text-blue-700">Click to fill credentials and test any role:</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-1.5 pt-0.5">
+              <button
+                type="button"
+                onClick={() => {
+                  setUsername('aarav');
+                  setPassword('123456');
+                }}
+                className="py-1 px-1.5 rounded-lg bg-white border border-blue-200 hover:border-blue-400 hover:bg-blue-100/60 text-[11px] font-medium text-blue-900 transition-colors shadow-2xs text-center cursor-pointer"
+                title="Fill Citizen credentials (aarav / 123456)"
+              >
+                👤 Citizen
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setUsername('pm_authority');
+                  setPassword('123456');
+                }}
+                className="py-1 px-1.5 rounded-lg bg-white border border-blue-200 hover:border-blue-400 hover:bg-blue-100/60 text-[11px] font-medium text-blue-900 transition-colors shadow-2xs text-center cursor-pointer"
+                title="Fill Authority / PM credentials (pm_authority / 123456)"
+              >
+                🛡️ Authority
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setUsername('contractor_apex');
+                  setPassword('123456');
+                }}
+                className="py-1 px-1.5 rounded-lg bg-white border border-blue-200 hover:border-blue-400 hover:bg-blue-100/60 text-[11px] font-medium text-blue-900 transition-colors shadow-2xs text-center cursor-pointer"
+                title="Fill Contractor credentials (contractor_apex / 123456)"
+              >
+                👷 Contractor
+              </button>
+            </div>
           </div>
         )}
 

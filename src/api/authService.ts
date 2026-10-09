@@ -29,12 +29,101 @@ export function normalizeUsername(username: string): string {
 const LOCAL_STORAGE_KEY_USERS = 'civicsight_local_users';
 const LOCAL_STORAGE_KEY_USERNAMES = 'civicsight_local_usernames';
 
+function getInitialSeedUsers(): Record<string, UserProfile & { passwordHash?: string }> {
+  const now = '2026-01-01T00:00:00.000Z';
+  return {
+    'cit-seed-1': {
+      uid: 'cit-seed-1',
+      username: 'aarav',
+      email: 'aarav@citizen.org',
+      displayName: 'Aarav Sharma',
+      role: 'citizen',
+      createdAt: now,
+      updatedAt: now,
+      isActive: true,
+      passwordHash: '123456',
+    },
+    'citizen-demo': {
+      uid: 'citizen-demo',
+      username: 'citizen',
+      email: 'citizen@civicsight.org',
+      displayName: 'Demo Citizen',
+      role: 'citizen',
+      createdAt: now,
+      updatedAt: now,
+      isActive: true,
+      passwordHash: '123456',
+    },
+    'pm-seed-1': {
+      uid: 'pm-seed-1',
+      username: 'pm_authority',
+      email: 'pm@civicsight.gov.in',
+      displayName: 'Er. Rajesh Deshmukh',
+      role: 'project_manager',
+      createdAt: now,
+      updatedAt: now,
+      isActive: true,
+      passwordHash: '123456',
+    },
+    'admin-demo': {
+      uid: 'admin-demo',
+      username: 'admin',
+      email: 'admin@civicsight.gov.in',
+      displayName: 'Municipal Commissioner',
+      role: 'project_manager',
+      createdAt: now,
+      updatedAt: now,
+      isActive: true,
+      passwordHash: '123456',
+    },
+    'cont-01': {
+      uid: 'cont-01',
+      username: 'contractor_apex',
+      email: 'apex@contractor.org',
+      displayName: 'Apex Urban Infra Tech Ltd',
+      role: 'contractor',
+      createdAt: now,
+      updatedAt: now,
+      isActive: true,
+      passwordHash: '123456',
+    },
+    'contractor-demo': {
+      uid: 'contractor-demo',
+      username: 'contractor',
+      email: 'contractor@civicsight.org',
+      displayName: 'Demo Contractor',
+      role: 'contractor',
+      createdAt: now,
+      updatedAt: now,
+      isActive: true,
+      passwordHash: '123456',
+    },
+  };
+}
+
+function getInitialSeedUsernames(): Record<string, UsernameDoc> {
+  const now = '2026-01-01T00:00:00.000Z';
+  return {
+    aarav: { uid: 'cit-seed-1', username: 'aarav', email: 'aarav@citizen.org', createdAt: now },
+    citizen: { uid: 'citizen-demo', username: 'citizen', email: 'citizen@civicsight.org', createdAt: now },
+    pm_authority: { uid: 'pm-seed-1', username: 'pm_authority', email: 'pm@civicsight.gov.in', createdAt: now },
+    admin: { uid: 'admin-demo', username: 'admin', email: 'admin@civicsight.gov.in', createdAt: now },
+    contractor_apex: { uid: 'cont-01', username: 'contractor_apex', email: 'apex@contractor.org', createdAt: now },
+    contractor: { uid: 'contractor-demo', username: 'contractor', email: 'contractor@civicsight.org', createdAt: now },
+  };
+}
+
 function getLocalUsers(): Record<string, UserProfile & { passwordHash?: string }> {
   try {
     const raw = sessionStorage.getItem(LOCAL_STORAGE_KEY_USERS);
-    return raw ? JSON.parse(raw) : {};
+    if (!raw) {
+      const seed = getInitialSeedUsers();
+      saveLocalUsers(seed);
+      return seed;
+    }
+    return JSON.parse(raw);
   } catch {
-    return {};
+    return getInitialSeedUsers();
   }
 }
 
@@ -49,9 +138,14 @@ function saveLocalUsers(users: Record<string, UserProfile & { passwordHash?: str
 function getLocalUsernames(): Record<string, UsernameDoc> {
   try {
     const raw = sessionStorage.getItem(LOCAL_STORAGE_KEY_USERNAMES);
-    return raw ? JSON.parse(raw) : {};
+    if (!raw) {
+      const seed = getInitialSeedUsernames();
+      saveLocalUsernames(seed);
+      return seed;
+    }
+    return JSON.parse(raw);
   } catch {
-    return {};
+    return getInitialSeedUsernames();
   }
 }
 
